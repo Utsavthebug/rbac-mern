@@ -8,7 +8,11 @@ export class User extends Base{
     user_id:number
 
     @Column({nullable:false})
-    name:string;
+    first_name:string;
+
+    
+    @Column({nullable:false})
+    last_name:string;
 
     @Column({nullable:false,unique:true})
     email:string;
