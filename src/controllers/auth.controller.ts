@@ -27,7 +27,9 @@ export class AuthController{
 
         const {password:discardPassword,...rest} = user
 
-        const token = encrypt.generateToken({id:user.user_id})
+        const token = encrypt.generateToken({id:user.id})
+
+        res.cookie('authcookie',token,{maxAge:60*60*60,httpOnly:true}) 
         
         return res.status(StatusCodes.OK).json({message:"Login Succesful",token,user:rest})
     }
@@ -57,21 +59,17 @@ export class AuthController{
         //getting respository
         await AuthController.userRepository.save(user)
 
-        //generating token 
-        const token = encrypt.generateToken({id:user.user_id})
-
-        res.status(StatusCodes.CREATED).json({message:"User Created Succesfully",token,user})
+        res.status(StatusCodes.CREATED).json({message:"User Created Succesfully",user})
     }
 
     public static async changePassword(req:Request,res:Response){
         const {oldpassword,newpassword} = req.body;
         const userId = req["currentUser"].id
         
-        const user = await AuthController.userRepository.findOne({
-            where:{
-                user_id: parseInt(userId)
-            }
-        })
+        const user = await AuthController.userRepository.createQueryBuilder('user')
+        .where("user.id = :userId",{userId})
+        .addSelect('user.password')
+        .getOne()
 
         if(!user){
            return res.status(StatusCodes.NOT_FOUND).json({})

@@ -5,14 +5,15 @@ import { AppDataSource } from "./data-source";
 import { errorHandler } from "./middleware/error.middleware";
 import { StatusCodes } from "http-status-codes";
 import { rootRouter } from "./routes";
+import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
 const app:Express = express()
 const port = process.env.PORT || 3000;
 
-
 app.use(express.json())
+app.use(cookieParser())
 
 app.use("/api/v1",rootRouter)
 app.get('*',(req:Request,res:Response)=>{
