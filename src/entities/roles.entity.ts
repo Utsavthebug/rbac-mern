@@ -1,26 +1,22 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { User } from "./user.entity";
 import { FeaturesToRoles } from "./featuretoroles.entity";
 
-@Entity({name:'features'})
-export class Features{
+@Entity({name:'roles'})
+export class Roles{
     @PrimaryGeneratedColumn()
-    feature_id:number
+    role_id:number
 
     @Column({nullable:false,unique:true})
-    feature_name:string;
-    
-    //if it is active for all clients 
-    @Column({default:false})
-    active:boolean;
+    role_name:string;
     
     @CreateDateColumn()
     created_at:Date;
 
-    @UpdateDateColumn()
-    updated_at:Date;
+    @OneToMany(()=>User,(user)=>user.role)
+    user:User[]
 
-    @OneToMany(()=>FeaturesToRoles,featureToRoles=>featureToRoles.feature)
+    @OneToMany(()=>FeaturesToRoles,featureToRoles=>featureToRoles.role)
     public featuretoroles:FeaturesToRoles[]
-
 
     }

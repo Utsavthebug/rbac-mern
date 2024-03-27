@@ -1,5 +1,6 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { Base } from "./base.entity";
+import { Roles } from "./roles.entity";
 
 @Entity({name:'users'})
 export class User extends Base{
@@ -14,5 +15,9 @@ export class User extends Base{
 
     @Column({nullable:false,select:false})
     password:string;
+
+    @ManyToOne(()=>Roles,(roles)=>roles.user)
+    @JoinColumn({name:'roleId'})
+    role:Roles;
 
     }
