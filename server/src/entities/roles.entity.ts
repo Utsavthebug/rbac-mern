@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./user.entity";
 import { FeaturesToRoles } from "./featuretoroles.entity";
 
@@ -19,4 +19,11 @@ export class Roles{
     @OneToMany(()=>FeaturesToRoles,featureToRoles=>featureToRoles.role)
     public featuretoroles:FeaturesToRoles[]
 
+    @BeforeInsert()
+    @BeforeUpdate()
+    transformToLowercase() {
+        if (this.role_name) {
+            this.role_name = this.role_name.toLowerCase();
+        }
+    }
     }

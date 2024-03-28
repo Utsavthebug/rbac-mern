@@ -37,7 +37,7 @@ export class RoleController{
         const {role_name} = req.body
 
         const roleInstance = new Roles()
-        roleInstance.role_name = role_name.toLowerCase()
+        roleInstance.role_name = role_name
 
         const newrole = await RoleController.roleRepository.save(roleInstance)
 
