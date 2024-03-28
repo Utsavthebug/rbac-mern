@@ -13,6 +13,12 @@ export class Roles{
     @CreateDateColumn()
     created_at:Date;
 
+    @Column({
+        type:'varchar',
+        nullable:true,
+    })
+    description:string;
+
     @OneToMany(()=>User,(user)=>user.role)
     user:User[]
 

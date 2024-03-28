@@ -2,9 +2,14 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { StatusCodes } from "http-status-codes";
 import { Roles } from "../entities/roles.entity";
+import { FeaturesToRoles } from "../entities/featuretoroles.entity";
+import { Features } from "../entities/features.entity";
 
 export class RoleController{
     private static readonly roleRepository = AppDataSource.getRepository(Roles)
+    private static readonly featuretoRolesRepository = AppDataSource.getRepository(FeaturesToRoles)
+    private static readonly featureRepository = AppDataSource.getRepository(Features)
+
 
     public static async getAll(req:Request,res:Response){
 
@@ -34,14 +39,37 @@ export class RoleController{
     }
 
     public static async create(req:Request,res:Response){
-        const {role_name} = req.body
+        const {role_name,featuretoroles} = req.body
 
         const roleInstance = new Roles()
         roleInstance.role_name = role_name
 
         const newrole = await RoleController.roleRepository.save(roleInstance)
 
-        return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:newrole})
+        //adding feature to roles 
+        let feature_roles_array = []
+        if(featuretoroles.length>0){
+            for (const featurerole of featuretoroles){
+                //getting feature from feature_id 
+                const feature = await RoleController.featureRepository.findOne({where:{
+                    feature_id:featurerole.feature_id
+                }})
+
+                const featuretoRolesInstance = new FeaturesToRoles()
+                featuretoRolesInstance.feature_access = featurerole.feature_access
+                if(feature) featuretoRolesInstance.feature = feature
+                featuretoRolesInstance.role = newrole
+                feature_roles_array.push(featuretoRolesInstance)
+                await RoleController.featuretoRolesRepository.save(featuretoRolesInstance)
+            }
+        }
+
+        const newroles_features = {
+            role:newrole,
+            roles_features:feature_roles_array
+        }
+
+        return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:newroles_features})
     }
 
  
