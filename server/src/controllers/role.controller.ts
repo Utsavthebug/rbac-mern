@@ -109,10 +109,46 @@ export class RoleController{
         if(description) role.description = description
         await RoleController.roleRepository.save(role)
 
-    }
-
-
+        //feature roles 
+        if(feature_roles && feature_roles.length>0){
+        const filtered_feature_roles = feature_roles
+        .filter((featurerole:any)=>!!featurerole.id)
     
+
+        filtered_feature_roles.length>0 && await RoleController.featuretoRolesRepository.save([...filtered_feature_roles])
+
+        const new_feature_roles = feature_roles
+        .filter((featurerole:any)=>!featurerole.id)
+
+        let feature_role_instances = []
+
+        for(const featurerole of new_feature_roles){
+            const featureroleInstance = new FeaturesToRoles()
+            featureroleInstance.roleId = parseInt(roleId)
+            featureroleInstance.featureId = featurerole.featureId
+            if(featurerole.feature_access) featureroleInstance.feature_access = featurerole.feature_access
+            feature_role_instances.push(featureroleInstance)
+        }
+
+        //saving all instances       
+        feature_role_instances.length > 0 && await RoleController.featuretoRolesRepository.save([...feature_role_instances])
+
+        const rolewithfeatures = await RoleController.roleRepository.findOne(
+            {
+                relations:{
+                    featuretoroles:true
+                },
+                where:{
+                 role_id: parseInt(roleId)   
+                }
+            }
+        )
+           
+        return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:rolewithfeatures})
+
+       }
+}
+  
     public static async getOne(req:Request,res:Response){
         const {roleId} = req.params
   

@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, Unique } from "typeorm";
-import { User } from "./user.entity";
 import { Base } from "./base.entity";
 import { FEATURE_ACCESS } from "../types/access.type";
 import { Features } from "./features.entity";

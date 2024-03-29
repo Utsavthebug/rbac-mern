@@ -15,10 +15,31 @@ export class FeatureToRolesController{
 
     public static async create(req:Request,res:Response){
         const {role_features} = req.body
+        const role_features_instances = []
+        //getting instances 
+        for (const rolefeature of role_features ){
+            const role = await FeatureToRolesController.roleRepository.findOne({
+                where:{
+                    role_id:rolefeature.roleId
+                }
+            })
+
+            const feature = await FeatureToRolesController.featureRepository.findOne({
+                where:{
+                    feature_id:rolefeature.featureId
+                }
+            })
+
+            role_features_instances.push({
+                ...rolefeature,
+                feature,
+                role
+            })
+        }
         
         //upserting 
        const created = await FeatureToRolesController.featureToRolesRepository.upsert([
-            ...role_features
+            ...role_features_instances
         ],['roleId','featureId'])
 
         //getting array of ids 
