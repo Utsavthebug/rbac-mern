@@ -16,7 +16,7 @@ export class User extends Base{
     @Column({nullable:false,select:false})
     password:string;
 
-    @ManyToOne(()=>Roles,(roles)=>roles.user)
+    @ManyToOne(()=>Roles,(roles)=>roles.user,{onDelete:'SET NULL'})
     @JoinColumn({name:'roleId'})
     role:Roles;
 

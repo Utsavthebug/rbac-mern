@@ -21,9 +21,9 @@ export class FeaturesToRoles extends Base{
     })
     feature_access:FEATURE_ACCESS
 
-    @ManyToOne(()=>Features,(feature)=>feature.featuretoroles)
+    @ManyToOne(()=>Features,(feature)=>feature.featuretoroles,{onDelete:'CASCADE'})
     public feature:Features
 
-    @ManyToOne(()=>Roles,(role)=>role.featuretoroles)
+    @ManyToOne(()=>Roles,(role)=>role.featuretoroles,{onDelete:'CASCADE'})
     public role:Roles
     }

@@ -59,7 +59,7 @@ export class RoleController{
         if(featuretoroles && featuretoroles.length>0){
             const newmappeddata = featuretoroles.map((featurerole:any)=>{
                 return {
-                    featureId:featurerole.feature_id,
+                    featureId:featurerole.featureId,
                     roleId:newrole.role_id,
                     feature_access:featurerole.feature_access
                 }
