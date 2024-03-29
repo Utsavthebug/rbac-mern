@@ -13,4 +13,4 @@ router.route('/:featureId')
 .get(ErrorWrapper(FeatureController.getOne))
 
 
-export {router as authRouter}
+export {router as featureRouter}

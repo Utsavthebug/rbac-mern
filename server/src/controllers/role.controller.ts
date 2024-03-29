@@ -10,6 +10,15 @@ export class RoleController{
     private static readonly featuretoRolesRepository = AppDataSource.getRepository(FeaturesToRoles)
     private static readonly featureRepository = AppDataSource.getRepository(Features)
 
+    public static async getrolebyId(id:number){
+        const role = await RoleController.roleRepository.findOne(
+          { where:{
+                role_id:id
+            }
+        }
+        )
+        return role
+    }
 
     public static async getAll(req:Request,res:Response){
 
@@ -47,29 +56,29 @@ export class RoleController{
         const newrole = await RoleController.roleRepository.save(roleInstance)
 
         //adding feature to roles 
-        let feature_roles_array = []
-        if(featuretoroles.length>0){
-            for (const featurerole of featuretoroles){
-                //getting feature from feature_id 
-                const feature = await RoleController.featureRepository.findOne({where:{
-                    feature_id:featurerole.feature_id
-                }})
+        if(featuretoroles && featuretoroles.length>0){
+            const newmappeddata = featuretoroles.map((featurerole:any)=>{
+                return {
+                    featureId:featurerole.feature_id,
+                    roleId:newrole.role_id,
+                    feature_access:featurerole.feature_access
+                }
+            })
+         await RoleController.featuretoRolesRepository.insert(newmappeddata)       
+    }
 
-                const featuretoRolesInstance = new FeaturesToRoles()
-                featuretoRolesInstance.feature_access = featurerole.feature_access
-                if(feature) featuretoRolesInstance.feature = feature
-                featuretoRolesInstance.role = newrole
-                feature_roles_array.push(featuretoRolesInstance)
-                await RoleController.featuretoRolesRepository.save(featuretoRolesInstance)
+    const rolewithfeatures = await RoleController.roleRepository.findOne(
+        {
+            relations:{
+                featuretoroles:true
+            },
+            where:{
+             role_id:newrole.role_id   
             }
         }
-
-        const newroles_features = {
-            role:newrole,
-            roles_features:feature_roles_array
-        }
-
-        return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:newroles_features})
+    )
+       
+    return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:rolewithfeatures})
     }
 
  
@@ -85,6 +94,23 @@ export class RoleController{
 
       return res.status(StatusCodes.OK).json({message:"role deleted Succesfully"})
     }
+
+    public static async update(req:Request,res:Response){
+        const {roleId} = req.params
+        const {role_name,description,feature_roles} = req.body
+
+        const role = await RoleController.getrolebyId(parseInt(roleId))
+
+        if(!role){
+            return res.status(StatusCodes.NOT_FOUND).json({message:"Invalid role Id"})
+        }
+
+        if(role_name) role.role_name = role_name
+        if(description) role.description = description
+        await RoleController.roleRepository.save(role)
+
+    }
+
 
     
     public static async getOne(req:Request,res:Response){

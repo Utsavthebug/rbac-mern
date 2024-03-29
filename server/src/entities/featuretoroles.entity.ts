@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, Unique } from "typeorm";
 import { User } from "./user.entity";
 import { Base } from "./base.entity";
 import { FEATURE_ACCESS } from "../types/access.type";
@@ -7,12 +7,12 @@ import { Roles } from "./roles.entity";
 
 
 @Entity({name:'features_roles'})
+ @Unique('feature_role_unique_constraint',['featureId','roleId'])
 export class FeaturesToRoles extends Base{
-
     @Column()
     public featureId:number;
     
-    @CreateDateColumn()
+    @Column()
     public roleId:number;
 
     @Column({

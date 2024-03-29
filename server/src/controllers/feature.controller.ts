@@ -93,7 +93,7 @@ export class FeatureController{
         }
 
         if(feature_name) feature.feature_name  = feature_name
-        if(active) feature.active = active
+          feature.active = active
         
         const updated_feature = await FeatureController.featureRepository.save(feature)
 
