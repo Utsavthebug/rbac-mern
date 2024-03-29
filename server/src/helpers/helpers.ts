@@ -23,3 +23,9 @@ export class encrypt{
         return token;
     }
 }
+
+export class stringHelper {
+    static queryParamToBool(value:string) {
+        return ((value+'').toLowerCase() === 'true')
+      }
+}

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { StatusCodes } from "http-status-codes";
 import { Features } from "../entities/features.entity";
+import { stringHelper } from "../helpers/helpers";
+import { ILike } from "typeorm";
 
 
 export class FeatureController{
@@ -12,13 +14,14 @@ export class FeatureController{
        //searching filtering and pagination
        let options = {}
 
-       if(req.query.search){
+       if(req.query.search || req.query.active){
         options = {
             ...options,
             where:{
-                $or:[
-                    {feature_name: new RegExp(req.query.search.toString(),'i')}
-                ]
+              ...(req.query.search &&
+                    {feature_name:  ILike(`%${req.query.search.toString()}%`)}
+                 ),
+            ...(req.query.active && {active: stringHelper.queryParamToBool(req.query.active as string)} )
             }
         }
        }
@@ -40,7 +43,7 @@ export class FeatureController{
         const featureInstance = new Features()
         featureInstance.feature_name = feature_name
 
-        if(active) featureInstance.active = active;
+        if(typeof active==="boolean") featureInstance.active = active;
 
         const newfeature = await FeatureController.featureRepository.save(featureInstance)
 
@@ -93,7 +96,8 @@ export class FeatureController{
         }
 
         if(feature_name) feature.feature_name  = feature_name
-          feature.active = active
+        if(typeof active==="boolean") feature.active = active;
+
         
         const updated_feature = await FeatureController.featureRepository.save(feature)
 
