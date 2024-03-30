@@ -1,19 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axiosInstance from '../../api'
-import { authApi, userApi } from '../../constants/url'
+import { apis} from '../../constants/url'
 import {fetchStatus} from '../../constants/constants'
 import { toast } from 'react-toastify'
 
 
 const initialState = {
-  me:{},
+  me:undefined,
   error:"",
   status:""
 }
 
 export const fetchMe = createAsyncThunk('auth/fetchme',async(_, { rejectWithValue })=>{
     try {
-        const {data}  = axiosInstance.get(userApi.me)
+        const {data}  = await axiosInstance.get(apis.me)
         return data
     } catch (error) {
       return rejectWithValue(error.response.data.error.message)
@@ -23,10 +23,19 @@ export const fetchMe = createAsyncThunk('auth/fetchme',async(_, { rejectWithValu
 export const loginUser = createAsyncThunk('auth/login',async(values, { rejectWithValue })=>{
   try {
       const {email,password} = values
-      const {data}  = await axiosInstance.post(authApi.auth('login'),{
+      const {data}  = await axiosInstance.post(apis.auth('login'),{
         email,
         password
       })
+      return data
+  } catch (error) { 
+    return rejectWithValue(error.response.data.error.message)
+  }
+})
+
+export const logoutUser = createAsyncThunk('auth/logout',async(_, { rejectWithValue })=>{
+  try {
+      const {data}  = await axiosInstance.post(apis.auth('logout'))
       return data
   } catch (error) { 
     return rejectWithValue(error.response.data.error.message)
@@ -70,6 +79,22 @@ export const authSlice = createSlice({
       state.error = action.payload
       toast.error(action.payload)
   })
+
+
+  builder.addCase(logoutUser.pending,(state,action)=>{
+    state.status = fetchStatus.loading
+})
+
+builder.addCase(logoutUser.fulfilled,(state,action)=>{
+    state.status = fetchStatus.succeded
+    state.me = undefined
+    sessionStorage.removeItem('token')
+})
+
+builder.addCase(logoutUser.rejected,(state,action)=>{
+    state.status = fetchStatus.failed
+    state.error = action.payload
+})
 
 
   }

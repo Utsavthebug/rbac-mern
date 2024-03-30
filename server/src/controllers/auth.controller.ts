@@ -9,6 +9,11 @@ import createHttpError from "http-errors"
 export class AuthController{
     private static readonly userRepository = AppDataSource.getRepository(User)
 
+    public static async logout(req:Request,res:Response){
+    res.clearCookie('authcookie')
+    return res.status(StatusCodes.OK).json({message:"Succesfully logged out"})
+    }
+
     public static async login(req:Request,res:Response){
         const {email,password} = req.body
 

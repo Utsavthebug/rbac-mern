@@ -5,10 +5,8 @@ const app = {
     }
 }
 
-export const userApi = {
-    me:`${app.root.user}/me`
+export const apis = {
+    me : `${app.root.user}/me`,
+    auth:(type)=>`${app.root.auth}/${type}`
 }
 
-export const authApi = {
-    auth : (type)=> `${app.root.auth}/${type}`
-}
