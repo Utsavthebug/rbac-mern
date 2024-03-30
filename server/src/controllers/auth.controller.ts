@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entities/user.entity";
 import { encrypt } from "../helpers/helpers";
 import { StatusCodes } from "http-status-codes";
+import createHttpError from "http-errors"
 
 
 export class AuthController{
@@ -13,16 +14,17 @@ export class AuthController{
 
         const user = await AuthController.userRepository.createQueryBuilder('user')
         .where("user.email = :email",{email})
+        .leftJoinAndSelect('user.role','role')
         .addSelect('user.password')
         .getOne()
 
         if(!user){
-           return res.status(StatusCodes.NOT_FOUND).json({message:"User not found"})
+          throw createHttpError.NotFound("Invalid Credentials")
         }
         //comparing password
         const isPasswordValid =await encrypt.comparepassword(user.password,password)
         if(!isPasswordValid){
-           return res.status(StatusCodes.NOT_FOUND).json({message:"Invalid Credentials"})
+            throw createHttpError.NotFound("Invalid Credentials")
         }
 
         const {password:discardPassword,...rest} = user

@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
-export const errorHandler = (error:Error,req:Request,res:Response,next:NextFunction)=>{
-    const message = error.message || 'Internal Server Error'
-    return  res.status(500).json({message})
+export const errorHandler = (err:any,req:Request,res:Response,next:NextFunction)=>{
+    res.status(err.status || 500)
+    res.send({
+        error:{
+            status:err.status || 500,
+            message:err.message
+        }
+    })
 }
