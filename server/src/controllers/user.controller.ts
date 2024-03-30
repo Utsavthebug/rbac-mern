@@ -102,9 +102,24 @@ export class UserController{
 
          const updated_user = await UserController.userRepository.save(userInstance)
 
-         return res.status(StatusCodes.OK).json({message:"User Updated Succesfully"})
+         return res.status(StatusCodes.OK).json({message:"User Updated Succesfully",data:updated_user})
 
        }
+
+    public static async fetchMe(req:Request,res:Response){
+        const userId = req["currentUser"].id
+        //fetching user info
+        const userdata = await UserController.userRepository.findOne({
+            relations:{
+                role:true
+            },
+            where:{
+                id:parseInt(userId)
+            }
+        })
+
+        return res.status(StatusCodes.OK).json({data:userdata})
+    }
   
   
 }
