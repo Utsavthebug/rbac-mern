@@ -7,7 +7,6 @@ const Table = ({
   data,
   columnKeys=[]
 }) => {
-  console.log(data,'from table')
 
   const hasAction = onEdit || onDelete
   const final_headers = [
@@ -42,7 +41,7 @@ const Table = ({
       {
         hasAction && (<td className="px-6 py-4">
         <div className="flex justify-end gap-4">
-         {onDelete && <button>
+         {onDelete && <button onClick={()=>onDelete(d?.id)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -61,7 +60,7 @@ const Table = ({
           </button>  
         }
          
-         { onEdit && <button>
+         { onEdit && <button onClick={()=>onEdit(d?.id)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

@@ -6,7 +6,8 @@ import { fetchStatus } from "../../constants/constants";
 const initialState = {
     users:[],
     error:"",
-    status:""
+    status:"",
+    selectedUser:undefined
 }
 
 export const addUser = createAsyncThunk('users/add',async(values,{rejectWithValue})=>{
@@ -42,7 +43,11 @@ const usersSlice = createSlice({
     name:'users',
     initialState,
     reducers:{
-
+        setSelectedUser:(state,action)=>{
+            const userbyfind = state.users.find((user)=>user.id==action.payload)
+            console.log('user by id',userbyfind)
+            state.selectedUser = userbyfind
+        }
     },
     extraReducers:(builder) =>{
         builder.addCase(addUser.pending,(state,action)=>{
@@ -51,7 +56,7 @@ const usersSlice = createSlice({
     
         builder.addCase(addUser.fulfilled,(state,action)=>{
             state.status = fetchStatus.succeded
-            state.users = state.users.unshift(action.payload)
+            state.users.unshift(action.payload.user)
         })
     
         builder.addCase(addUser.rejected,(state,action)=>{
@@ -81,7 +86,7 @@ const usersSlice = createSlice({
     
         builder.addCase(deleteUser.fulfilled,(state,action)=>{
             state.status = fetchStatus.succeded
-            state.users = state.users.filter((user)=>user.id!==action.payload)
+            state.users = state.users.filter((user)=>user.id!=action.payload.id)
         })
     
         builder.addCase(deleteUser.rejected,(state,action)=>{
@@ -91,5 +96,7 @@ const usersSlice = createSlice({
     }
 
 })
+
+export const {setSelectedUser} = usersSlice.actions
 
 export default usersSlice.reducer

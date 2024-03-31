@@ -10,12 +10,14 @@ const btnColors = (type)=>{
 const Button = (
     {label,
      type="info",
-     icon
+     icon,
+     onClick
     }
 
 ) => {
   return (
   <button
+  onClick={onClick}
   type="submit"
   className={`inline-block 
   rounded 

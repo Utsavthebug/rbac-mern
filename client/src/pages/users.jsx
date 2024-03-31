@@ -10,8 +10,9 @@ import Input from '../component/Input'
 import { IoMdPersonAdd } from "react-icons/io";
 import Dropdown from '../component/Dropdown'
 import {useDispatch, useSelector} from 'react-redux'
-import { addUser, fetchAllUsers } from '../store/users/userSlice'
+import { addUser, deleteUser, fetchAllUsers, setSelectedUser } from '../store/users/userSlice'
 import FeatureText from '../component/FeatureText'
+
 
 const createUserSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -31,7 +32,8 @@ export const roles_options = (roles)=>{
 
 
 const CreateUserModal = ({
-  open
+  open,
+  toggleModal
 })=>{
   const dispatch = useDispatch()
 
@@ -46,8 +48,9 @@ const CreateUserModal = ({
     validateOnBlur:false,
     validateOnChange:false,
     enableReinitialize:true,
-    onSubmit: async values=>{
+    onSubmit:  async values=>{
      await dispatch(addUser(values))
+     toggleModal()
     }
   })
 
@@ -56,6 +59,7 @@ const CreateUserModal = ({
   return (
     <Modal 
     open={open}
+    onClose={toggleModal}
     title="Create User">
   <form onSubmit={formik.handleSubmit} className="p-4 md:p-5">
     <div className="grid gap-4 mb-4 grid-cols-2">
@@ -130,8 +134,8 @@ const Users = () => {
   const users = useSelector((state)=>state.users)
 
 
-  const handleClick = ()=>{
-    setModalOpen(true)
+  const toggleModal = ()=>{
+    setModalOpen((prev)=>!prev)
   }
 
   useEffect(()=>{
@@ -154,7 +158,7 @@ const RenderRole = (role)=>{
 }
 
   const renderUserTable = (users) =>{
-    return users.map((user)=>{
+    return users?.map((user)=>{
       return {
         id:user.id,
         name : RenderName(user),
@@ -163,10 +167,20 @@ const RenderRole = (role)=>{
     })
   }
 
+  const handleUserDelete = (id)=>{
+    dispatch(deleteUser(id))
+  }
+
+  const handleUserUpdate = (id)=>{
+    dispatch(setSelectedUser(id))
+    setModalOpen((prev)=>!prev)
+  }
+
     return (
       <>
       <CreateUserModal
       open={modalOpen}
+      toggleModal={toggleModal}
       />
         <div className='p-5'>
         <div className='flex mb-8 justify-between'>
@@ -181,15 +195,15 @@ const RenderRole = (role)=>{
     
           <Button
           label={"Add Users"}
-          onClick={handleClick}
+          onClick={toggleModal}
           />
           </div>
         </div>
         <Table
         headers={table_constants.user_table.headers}
-        onDelete={true}
+        onDelete={handleUserDelete}
         data={renderUserTable(users?.users)}
-        onEdit={true}
+        onEdit={handleUserUpdate}
         columnKeys={['name','role']}
         />
         </div>
