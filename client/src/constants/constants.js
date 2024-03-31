@@ -11,24 +11,40 @@ export const fetchStatus = {
 
 export const SidebarConstant = [
     {
-        path:'/dashboard',
+        path:'/admin/dashboard',
         label:'Dashboard',
         icon:MdDashboard
     },
     {
-        path:'/roles',
+        path:'/admin/roles',
         label:'Roles',
         icon:RiAdminFill
     },
     {
-        path:'/users',
+        path:'/admin/users',
         label:'Users',
         icon:FaUsers 
     },
     {
-        path:'/features',
+        path:'/admin/features',
         label:'Features',
         icon:IoMdKeypad 
     }
 
 ]
+
+export const table_constants = {
+    role_table : {
+        headers :[
+            "Role",
+            "Created",
+            "Description"
+        ]
+    },
+    user_table:{
+        headers:[
+            "Name",
+            "User Role"
+        ]
+    }
+}

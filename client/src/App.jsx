@@ -24,7 +24,7 @@ function App() {
       ...authRoutes.map((authroute)=><Route path={authroute.path} element={<authroute.component/>} />)
     }
     {/* protected routes */}
-    <Route element={<ProtectedRoutes isAuth={isAuth} />}>
+    <Route element={<ProtectedRoutes isAuth={isAuth} permissions={['admin']}/>}>
       <Route element={<DashboardLayout/>}> 
       {
         ...adminRoutes.map((adminRoute)=><Route

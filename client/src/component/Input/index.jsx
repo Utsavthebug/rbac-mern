@@ -5,11 +5,12 @@ const Input = ({
     name,
     type="text",
     handleChange,
-    errors
+    errors,
+    required
 }) => {
   return (
     <div>
-    <label className="block text-sm font-medium leading-6 text-gray-900">{label}</label>
+    <label className="block text-sm font-medium leading-6 text-gray-900">{label}{required && <span className=' text-red-600'>*</span>}</label>
     <div className="mt-2">
       <input 
       name={name}

@@ -4,10 +4,12 @@ import { User } from "../entities/user.entity";
 import { encrypt } from "../helpers/helpers";
 import { StatusCodes } from "http-status-codes";
 import createHttpError from "http-errors"
+import { Roles } from "../entities/roles.entity";
 
 
 export class AuthController{
     private static readonly userRepository = AppDataSource.getRepository(User)
+    private static readonly roleRepository = AppDataSource.getRepository(Roles)
 
     public static async logout(req:Request,res:Response){
     res.clearCookie('authcookie')
@@ -42,7 +44,7 @@ export class AuthController{
     }
 
     public static async register(req:Request,res:Response){
-        const {first_name,last_name,email,password} = req.body
+        const {first_name,last_name,email,password,role} = req.body
 
         //get user
         const hasUser = await AuthController.userRepository.findOne({
@@ -54,6 +56,15 @@ export class AuthController{
             return res.status(StatusCodes.BAD_REQUEST).json({message:"Email is already used"})
         }
 
+        //getting role instances 
+        const roleInstance = await AuthController.roleRepository.findOne({
+            where:{
+                role_id:role
+            }
+        })
+
+
+
         //hash password
         const hashedPassword =await encrypt.encryptpass(password)
 
@@ -62,6 +73,7 @@ export class AuthController{
         user.last_name=last_name
         user.password=hashedPassword
         user.email=email
+        if(roleInstance) user.role = roleInstance
 
         //getting respository
         await AuthController.userRepository.save(user)
