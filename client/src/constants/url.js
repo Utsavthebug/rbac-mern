@@ -2,7 +2,7 @@ const app = {
     root:{
         user:'/user',
         auth:'/auth'
-    }
+    },
 }
 
 export const apis = {

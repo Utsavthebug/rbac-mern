@@ -71,6 +71,7 @@ export const authSlice = createSlice({
       state.status = fetchStatus.succeded
       state.me = action.payload.user
       sessionStorage.setItem('token',action.payload.token)
+      sessionStorage.setItem('role',action.payload.user.role.role_name)
       toast.success(action.payload.message)
   })
 
@@ -88,7 +89,7 @@ export const authSlice = createSlice({
 builder.addCase(logoutUser.fulfilled,(state,action)=>{
     state.status = fetchStatus.succeded
     state.me = undefined
-    sessionStorage.removeItem('token')
+    sessionStorage.clear()
 })
 
 builder.addCase(logoutUser.rejected,(state,action)=>{
