@@ -38,7 +38,7 @@ export class AuthController{
 
         const token = encrypt.generateToken({id:user.id})
 
-        res.cookie('authcookie',token,{maxAge:60*60*60,httpOnly:true}) 
+        res.cookie('authcookie',token,{maxAge:24*60*60*60,httpOnly:true}) 
         
         return res.status(StatusCodes.OK).json({message:"Login Succesful",token,user:rest})
     }

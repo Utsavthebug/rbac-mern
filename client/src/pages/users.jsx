@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '../component/Button'
 import SearchBar from '../component/Searchbar'
 import Table from '../component/Table'
@@ -9,6 +9,9 @@ import * as Yup from 'yup';
 import Input from '../component/Input'
 import { IoMdPersonAdd } from "react-icons/io";
 import Dropdown from '../component/Dropdown'
+import {useDispatch, useSelector} from 'react-redux'
+import { addUser, fetchAllUsers } from '../store/users/userSlice'
+import FeatureText from '../component/FeatureText'
 
 const createUserSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -19,7 +22,19 @@ const createUserSchema = Yup.object().shape({
 })
 
 
-const CreateUserModal = ()=>{
+export const roles_options = (roles)=>{
+  return roles.map((role)=>({
+    value:role.role_id,
+    label:role.role_name
+  }))
+}
+
+
+const CreateUserModal = ({
+  open
+})=>{
+  const dispatch = useDispatch()
+
   const formik = useFormik({
     initialValues:{
       email:"",
@@ -31,16 +46,17 @@ const CreateUserModal = ()=>{
     validateOnBlur:false,
     validateOnChange:false,
     enableReinitialize:true,
-    onSubmit: values=>{
-      console.log(values)
-      // dispatch(loginUser(values))
+    onSubmit: async values=>{
+     await dispatch(addUser(values))
     }
   })
 
-  console.log(formik.errors)
+  const {roles} = useSelector((state)=>state.role)
 
   return (
-    <Modal title="Create User">
+    <Modal 
+    open={open}
+    title="Create User">
   <form onSubmit={formik.handleSubmit} className="p-4 md:p-5">
     <div className="grid gap-4 mb-4 grid-cols-2">
   <div className="col-span-2 sm:col-span-1">
@@ -94,11 +110,7 @@ const CreateUserModal = ()=>{
           label={"Role"}
           required
           errors={formik.errors}
-          options={[
-            {label:'User',value:1},
-            {label:'Admin',value:2},
-            {label:'Super Admin',value:3}
-          ]}
+          options={roles_options(roles)}
           />
         </div>
     </div>
@@ -113,10 +125,48 @@ const CreateUserModal = ()=>{
 
 
 const Users = () => {
+  const [modalOpen,setModalOpen] = useState(false)
+  const dispatch = useDispatch()
+  const users = useSelector((state)=>state.users)
+
+
+  const handleClick = ()=>{
+    setModalOpen(true)
+  }
+
+  useEffect(()=>{
+    dispatch(fetchAllUsers())
+  },[])
+
+  const RenderName = (user)=>{
+    return (
+      <div className="text-sm">
+      <div className="font-medium text-gray-700">{user.first_name} {user.last_name}</div>
+      <div className="text-gray-400">{user.email}</div>
+    </div>
+    )
+  }
+
+const RenderRole = (role)=>{
+  return <FeatureText>
+      {role}
+  </FeatureText>
+}
+
+  const renderUserTable = (users) =>{
+    return users.map((user)=>{
+      return {
+        id:user.id,
+        name : RenderName(user),
+        role: RenderRole(user.role.role_name)
+      }
+    })
+  }
 
     return (
       <>
       <CreateUserModal
+      open={modalOpen}
       />
         <div className='p-5'>
         <div className='flex mb-8 justify-between'>
@@ -131,13 +181,16 @@ const Users = () => {
     
           <Button
           label={"Add Users"}
+          onClick={handleClick}
           />
           </div>
         </div>
         <Table
         headers={table_constants.user_table.headers}
         onDelete={true}
+        data={renderUserTable(users?.users)}
         onEdit={true}
+        columnKeys={['name','role']}
         />
         </div>
       </>

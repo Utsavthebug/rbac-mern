@@ -17,7 +17,7 @@ const Button = (
   return (
   <button
   type="submit"
-  class={`inline-block 
+  className={`inline-block 
   rounded 
   bg-info
   px-6 

@@ -14,19 +14,6 @@ export class UserController{
        //searching filtering and pagination
        let options = {}
 
-
-       const page = parseInt(req.query.page as string) || 1
-       const limit = parseInt(req.query.limit as string) || 10
-
-       const take = limit
-       const skip = (page-1) * take
-
-       options = {
-        ...options,
-        take,
-        skip
-       }
-
        if(req.query.search){
         options = {
             ...options,
@@ -49,14 +36,8 @@ export class UserController{
         },    
        })
 
-       const pagination = {
-        currentPage:page,
-        limit,
-        skip,
-        totalCount
-       }
-
-       return res.status(StatusCodes.OK).json({data:allusers,pagination})
+    
+       return res.status(StatusCodes.OK).json({data:allusers})
        
     }
 
@@ -70,7 +51,7 @@ export class UserController{
         .where("id = :id",{id})
         .execute();
   
-        return res.status(StatusCodes.OK).json({message:"User deleted Succesfully"})
+        return res.status(StatusCodes.OK).json({message:"User deleted Succesfully",id})
     }
 
     public static async update(req:Request,res:Response){
