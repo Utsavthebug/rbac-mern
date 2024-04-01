@@ -3,6 +3,8 @@ import { AppDataSource } from "../data-source";
 import { StatusCodes } from "http-status-codes";
 import { Roles } from "../entities/roles.entity";
 import { User } from "../entities/user.entity";
+import { ILike } from "typeorm";
+
 
 export class UserController{
     private static readonly userRepository = AppDataSource.getRepository(User)
@@ -17,23 +19,22 @@ export class UserController{
        if(req.query.search){
         options = {
             ...options,
-            where:{
-                $or:[
-                    {first_name: new RegExp(req.query.search.toString(),'i')},
-                    {last_name: new RegExp(req.query.search.toString(),'i')},
-                    {email: new RegExp(req.query.search.toString(),'i')}
+            where:[
+                    {first_name: ILike(`%${req.query.search.toString()}%`)},
+                    {last_name: ILike(`%${req.query.search.toString()}%`)},
+                    {email: ILike(`%${req.query.search.toString()}%`)}
                 ]
             }
         }
-       }
-
+    
        //get all users 
        const [allusers,totalCount] = await UserController.userRepository.findAndCount({
         relations:{
         role:{
            featuretoroles:true
         }
-        },    
+        },
+        ...options
        })
 
     

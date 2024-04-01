@@ -20,9 +20,11 @@ export const addUser = createAsyncThunk('users/add',async(values,{rejectWithValu
 })
 
 
-export const fetchAllUsers = createAsyncThunk('users/fetchall',async(_,{rejectWithValue})=>{
+export const fetchAllUsers = createAsyncThunk('users/fetchall',async(params,{rejectWithValue})=>{
     try {
-        const {data} = await axiosInstance.get(apis.user.root)
+        const {data} = await axiosInstance.get(apis.user.root,{
+            params
+        })
         return data
     } catch (error) {
       return rejectWithValue(error.response.data.error.message)   

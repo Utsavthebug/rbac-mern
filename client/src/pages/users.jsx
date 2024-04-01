@@ -12,6 +12,8 @@ import Dropdown from '../component/Dropdown'
 import {useDispatch, useSelector} from 'react-redux'
 import { addUser, deleteUser, fetchAllUsers, setSelectedUser } from '../store/users/userSlice'
 import FeatureText from '../component/FeatureText'
+import { toast } from 'react-toastify'
+
 
 
 const createUserSchema = Yup.object().shape({
@@ -33,7 +35,7 @@ export const roles_options = (roles)=>{
 
 const CreateUserModal = ({
   open,
-  toggleModal
+  setModalOpen
 })=>{
   const dispatch = useDispatch()
 
@@ -42,17 +44,35 @@ const CreateUserModal = ({
       email:"",
       password:"",
       first_name:"",
-      last_name:""
+      last_name:"",
+      role:""
     },
     validationSchema:createUserSchema,
     validateOnBlur:false,
     validateOnChange:false,
     enableReinitialize:true,
-    onSubmit:  async values=>{
-     await dispatch(addUser(values))
-     toggleModal()
+    onSubmit:  async (values,{setErrors,resetForm})=>{
+    const response = await dispatch(addUser(values))
+    if(response?.error){
+     toast.error(response.payload)
+    }
+    else {
+      resetForm({
+        email:"",
+        password:"",
+        first_name:"",
+        last_name:"",
+        role:""
+      })
+      setModalOpen(false)
+    }
     }
   })
+
+  const toggleModal = ()=>{
+    setModalOpen((prev)=>!prev)
+    formik.resetForm()
+  }
 
   const {roles} = useSelector((state)=>state.role)
 
@@ -61,7 +81,7 @@ const CreateUserModal = ({
     open={open}
     onClose={toggleModal}
     title="Create User">
-  <form onSubmit={formik.handleSubmit} className="p-4 md:p-5">
+  <form onSubmit={formik.handleSubmit} className="p-4 md:p-5" noValidate>
     <div className="grid gap-4 mb-4 grid-cols-2">
   <div className="col-span-2 sm:col-span-1">
       <Input
@@ -69,6 +89,7 @@ const CreateUserModal = ({
           type='text'
           errors={formik.errors}
           handleChange={formik.handleChange}
+          value={formik.values.first_name}
           name="first_name"
           required
           />
@@ -80,6 +101,7 @@ const CreateUserModal = ({
           type='text'
           errors={formik.errors}
           handleChange={formik.handleChange}
+          value={formik.values.last_name}
           name="last_name"
           />
 
@@ -91,6 +113,7 @@ const CreateUserModal = ({
               type='email'
               errors={formik.errors}
               handleChange={formik.handleChange}
+              value={formik.values.email}
               name="email"
               required
             />
@@ -102,6 +125,7 @@ const CreateUserModal = ({
               type='password'
               errors={formik.errors}
               handleChange={formik.handleChange}
+              value={formik.values.password}
               name="password"
               required
             />
@@ -129,8 +153,9 @@ const CreateUserModal = ({
 
 
 const Users = () => {
-  const [modalOpen,setModalOpen] = useState(false)
   const dispatch = useDispatch()
+  const [modalOpen,setModalOpen] = useState(false)
+  const [search,setSearch] = useState('')
   const users = useSelector((state)=>state.users)
 
 
@@ -139,8 +164,8 @@ const Users = () => {
   }
 
   useEffect(()=>{
-    dispatch(fetchAllUsers())
-  },[])
+    !search.length && dispatch(fetchAllUsers())
+  },[search])
 
   const RenderName = (user)=>{
     return (
@@ -152,7 +177,7 @@ const Users = () => {
   }
 
 const RenderRole = (role)=>{
-  return <FeatureText>
+  return role && <FeatureText>
       {role}
   </FeatureText>
 }
@@ -162,7 +187,7 @@ const RenderRole = (role)=>{
       return {
         id:user.id,
         name : RenderName(user),
-        role: RenderRole(user.role.role_name)
+        role: RenderRole(user.role?.role_name)
       }
     })
   }
@@ -176,11 +201,22 @@ const RenderRole = (role)=>{
     setModalOpen((prev)=>!prev)
   }
 
+  const handleSearchChange =(e)=>{
+    setSearch(e.target.value)
+  }
+
+  const handleKeyDown = (event)=>{
+    console.log(event.key,'key down handle')
+    if(event.key==='Enter' && search.length>0){
+      dispatch(fetchAllUsers({search}))
+    }
+  }
+
     return (
       <>
       <CreateUserModal
       open={modalOpen}
-      toggleModal={toggleModal}
+      setModalOpen={setModalOpen}
       />
         <div className='p-5'>
         <div className='flex mb-8 justify-between'>
@@ -191,11 +227,14 @@ const RenderRole = (role)=>{
           <div className='flex space-x-4'>
           <SearchBar
           name="users"
+          search={search}
+          handleChange={handleSearchChange}
+          onkeydown={handleKeyDown}
           />
     
           <Button
           label={"Add Users"}
-          onClick={toggleModal}
+          onClick={()=>setModalOpen(true)}
           />
           </div>
         </div>

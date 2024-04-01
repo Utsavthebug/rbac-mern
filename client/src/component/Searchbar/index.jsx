@@ -3,12 +3,10 @@ import React from "react";
 const SearchBar = ({
   search,
   name,
-  setSearch
+  handleChange,
+  onkeydown
 }) => {
   
-  const handleChange = (e)=>{
-    setSearch(e.target.value)
-  }
   return (
     <div className="relative w-full md:w-80">
     <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -19,6 +17,7 @@ const SearchBar = ({
     <input
     value={search}
     onChange={handleChange}
+    onKeyDown={onkeydown}
     type="text" 
     id="table-search-users" 
     className="block w-full h-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg lg:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 

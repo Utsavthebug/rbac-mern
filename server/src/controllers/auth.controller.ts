@@ -53,7 +53,8 @@ export class AuthController{
             }
         })
         if(hasUser){
-            return res.status(StatusCodes.BAD_REQUEST).json({message:"Email is already used"})
+            // return res.status(StatusCodes.BAD_REQUEST).json({message:"Email is already used"})
+            throw createHttpError.BadRequest('Email is already used')
         }
 
         //getting role instances 
