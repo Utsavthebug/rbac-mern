@@ -41,6 +41,17 @@ export const deleteUser = createAsyncThunk('users/delete',async(id,{rejectWithVa
     }
 })
 
+
+export const editUser = createAsyncThunk('users/update',async(data,{rejectWithValue})=>{
+    try {
+        const {id,...values} = data
+        const {data} = await axiosInstance.patch(`${apis.user.root}/${id}`)
+        return data
+    } catch (error) {
+      return rejectWithValue(error.response.data.error.message)   
+    }
+})
+
 const usersSlice = createSlice({
     name:'users',
     initialState,

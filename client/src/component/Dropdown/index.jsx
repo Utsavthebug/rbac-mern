@@ -6,16 +6,17 @@ const Dropdown = ({
     label,
     required,
     options=[],
-    handleChange
+    handleChange,
+    value
 }) => {
   return (
      <>
     <label for="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{label}{required&&<span className='text-red-500'>*</span>}</label>
-    <select onChange={handleChange} name={name} id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+    <select value={value} onChange={handleChange} name={name} id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
         <option selected="">Select {label}</option>
         {
             options.map((d)=>(
-                <option value={d?.value}>{d?.label}</option>
+                <option selected={d?.value===value} value={d?.value}>{d?.label}</option>
             ))
         }
     </select>

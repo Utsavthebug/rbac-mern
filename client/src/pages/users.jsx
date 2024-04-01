@@ -35,35 +35,63 @@ export const roles_options = (roles)=>{
 
 const CreateUserModal = ({
   open,
-  setModalOpen
+  setModalOpen,
+  selectedId,
+  setSelectedId
 })=>{
   const dispatch = useDispatch()
+  const {users} = useSelector((state)=>state.users)
+  const {roles} = useSelector((state)=>state.role)
 
-  const formik = useFormik({
-    initialValues:{
-      email:"",
-      password:"",
-      first_name:"",
-      last_name:"",
-      role:""
-    },
-    validationSchema:createUserSchema,
-    validateOnBlur:false,
-    validateOnChange:false,
-    enableReinitialize:true,
-    onSubmit:  async (values,{setErrors,resetForm})=>{
-    const response = await dispatch(addUser(values))
-    if(response?.error){
-     toast.error(response.payload)
+
+
+  const [initialValues,setInitialValues] = useState({
+    email:"",
+    password:"",
+    first_name:"",
+    last_name:"",
+    role:""
+  })
+
+  useEffect(()=>{
+    //getting data from state
+    if(selectedId){
+      const formData = users?.find((u)=>u.id==selectedId)
+      setInitialValues({
+        email:formData?.email,
+        first_name:formData?.first_name,
+        last_name:formData?.last_name,
+        role:formData?.role?.role_id
+      })
     }
-    else {
-      resetForm({
+    else{
+      setInitialValues({
         email:"",
         password:"",
         first_name:"",
         last_name:"",
         role:""
       })
+    }
+  },[selectedId])
+
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema:createUserSchema,
+    validateOnBlur:false,
+    validateOnChange:false,
+    enableReinitialize:true,
+    onSubmit:  async (values,{setErrors,resetForm})=>{
+     let response = {}
+      
+    response = formData && await dispatch(addUser(values))
+    
+    if(response?.error){
+     toast.error(response.payload)
+    }
+    else {
+      resetForm()
       setModalOpen(false)
     }
     }
@@ -72,10 +100,11 @@ const CreateUserModal = ({
   const toggleModal = ()=>{
     setModalOpen((prev)=>!prev)
     formik.resetForm()
+    setSelectedId(undefined)
   }
 
-  const {roles} = useSelector((state)=>state.role)
-
+//if selectedId is present it is in edit Mode
+const isEditMode = !!selectedId
   return (
     <Modal 
     open={open}
@@ -119,17 +148,19 @@ const CreateUserModal = ({
             />
         </div>
 
-        <div className="col-span-2">
-            <Input
-              label={"Password"}
-              type='password'
-              errors={formik.errors}
-              handleChange={formik.handleChange}
-              value={formik.values.password}
-              name="password"
-              required
-            />
-        </div>
+        {
+          !isEditMode &&  <div className="col-span-2">
+          <Input
+            label={"Password"}
+            type='password'
+            errors={formik.errors}
+            handleChange={formik.handleChange}
+            value={formik.values.password}
+            name="password"
+            required
+          />
+      </div>
+        }
 
         <div className="col-span-2">
           <Dropdown
@@ -139,6 +170,7 @@ const CreateUserModal = ({
           required
           errors={formik.errors}
           options={roles_options(roles)}
+          value={formik.values.role}
           />
         </div>
     </div>
@@ -155,13 +187,9 @@ const CreateUserModal = ({
 const Users = () => {
   const dispatch = useDispatch()
   const [modalOpen,setModalOpen] = useState(false)
+  const [selectedId,setSelectedId] = useState(undefined)
   const [search,setSearch] = useState('')
   const users = useSelector((state)=>state.users)
-
-
-  const toggleModal = ()=>{
-    setModalOpen((prev)=>!prev)
-  }
 
   useEffect(()=>{
     !search.length && dispatch(fetchAllUsers())
@@ -197,7 +225,8 @@ const RenderRole = (role)=>{
   }
 
   const handleUserUpdate = (id)=>{
-    dispatch(setSelectedUser(id))
+    // dispatch(setSelectedUser(id))
+    setSelectedId(id)
     setModalOpen((prev)=>!prev)
   }
 
@@ -206,7 +235,6 @@ const RenderRole = (role)=>{
   }
 
   const handleKeyDown = (event)=>{
-    console.log(event.key,'key down handle')
     if(event.key==='Enter' && search.length>0){
       dispatch(fetchAllUsers({search}))
     }
@@ -217,6 +245,8 @@ const RenderRole = (role)=>{
       <CreateUserModal
       open={modalOpen}
       setModalOpen={setModalOpen}
+      selectedId={selectedId}
+      setSelectedId={setSelectedId}
       />
         <div className='p-5'>
         <div className='flex mb-8 justify-between'>
