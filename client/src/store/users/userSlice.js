@@ -43,7 +43,6 @@ export const deleteUser = createAsyncThunk('users/delete',async(id,{rejectWithVa
 
 
 export const editUser = createAsyncThunk('users/update',async(editData,{rejectWithValue})=>{
-    console.log(editData,'editData')
     try {
         const {id,...values} = editData
         const {data} = await axiosInstance.patch(`${apis.user.root}/${id}`,values)
@@ -64,6 +63,7 @@ const usersSlice = createSlice({
         }
     },
     extraReducers:(builder) =>{
+        //adding user
         builder.addCase(addUser.pending,(state,action)=>{
             state.status = fetchStatus.loading
         })
@@ -79,6 +79,7 @@ const usersSlice = createSlice({
         })
 
 
+        //fetching all users
         builder.addCase(fetchAllUsers.pending,(state,action)=>{
             state.status = fetchStatus.loading
         })
@@ -94,6 +95,7 @@ const usersSlice = createSlice({
         })
 
 
+        //deleting users
         builder.addCase(deleteUser.pending,(state,action)=>{
             state.status = fetchStatus.loading
         })
@@ -107,6 +109,27 @@ const usersSlice = createSlice({
             state.status = fetchStatus.failed
             state.error = action.payload
         })
+
+     
+        //edit users
+        builder.addCase(editUser.pending,(state,action)=>{
+            state.status = fetchStatus.loading
+        })
+    
+        builder.addCase(editUser.fulfilled,(state,action)=>{
+            const payloaddata = action.payload.data
+            //setting edit data at start 
+            let deletedUser = state.users.filter((user)=> user.id!=payloaddata.id)
+            deletedUser.unshift(payloaddata)
+            state.users = deletedUser
+            state.status = fetchStatus.succeded
+        })
+    
+        builder.addCase(editUser.rejected,(state,action)=>{
+            state.status = fetchStatus.failed
+            state.error = action.payload
+        })
+
     }
 
 })

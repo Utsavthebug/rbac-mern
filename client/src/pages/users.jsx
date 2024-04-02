@@ -121,7 +121,7 @@ const isEditMode = !!selectedId
     open={open}
     onClose={toggleModal}
     title="Create User">
-  <form onSubmit={formik.handleSubmit} className="p-4 md:p-5" noValidate autoComplete='off'>
+  <form onSubmit={formik.handleSubmit} className="p-4 md:p-5" noValidate>
     <div className="grid gap-4 mb-4 grid-cols-2">
   <div className="col-span-2 sm:col-span-1">
       <Input
