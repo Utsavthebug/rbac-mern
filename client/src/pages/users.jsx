@@ -10,7 +10,7 @@ import Input from '../component/Input'
 import { IoMdPersonAdd } from "react-icons/io";
 import Dropdown from '../component/Dropdown'
 import {useDispatch, useSelector} from 'react-redux'
-import { addUser, deleteUser, fetchAllUsers, setSelectedUser } from '../store/users/userSlice'
+import { addUser, deleteUser, editUser, fetchAllUsers, setSelectedUser } from '../store/users/userSlice'
 import FeatureText from '../component/FeatureText'
 import { toast } from 'react-toastify'
 
@@ -20,6 +20,13 @@ const createUserSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
   password:Yup.string().required("Password is required"),
   first_name:Yup.string().required("First Name is required"),
+  last_name:Yup.string().optional(),
+  role:Yup.string().required("Role is required")
+})
+
+const updateUserSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email').optional(),
+  first_name:Yup.string().optional(),
   last_name:Yup.string().optional(),
   role:Yup.string().required("Role is required")
 })
@@ -75,17 +82,20 @@ const CreateUserModal = ({
     }
   },[selectedId])
 
+  const validationschema = selectedId ? updateUserSchema : createUserSchema
+
 
   const formik = useFormik({
     initialValues,
-    validationSchema:createUserSchema,
+    validationSchema:validationschema,
     validateOnBlur:false,
     validateOnChange:false,
     enableReinitialize:true,
     onSubmit:  async (values,{setErrors,resetForm})=>{
      let response = {}
-      
-    response = formData && await dispatch(addUser(values))
+    
+
+    response = !selectedId ? await dispatch(addUser(values)) : await dispatch(editUser({...values,id:selectedId}))
     
     if(response?.error){
      toast.error(response.payload)
@@ -103,6 +113,7 @@ const CreateUserModal = ({
     setSelectedId(undefined)
   }
 
+
 //if selectedId is present it is in edit Mode
 const isEditMode = !!selectedId
   return (
@@ -110,7 +121,7 @@ const isEditMode = !!selectedId
     open={open}
     onClose={toggleModal}
     title="Create User">
-  <form onSubmit={formik.handleSubmit} className="p-4 md:p-5" noValidate>
+  <form onSubmit={formik.handleSubmit} className="p-4 md:p-5" noValidate autoComplete='off'>
     <div className="grid gap-4 mb-4 grid-cols-2">
   <div className="col-span-2 sm:col-span-1">
       <Input
@@ -242,12 +253,15 @@ const RenderRole = (role)=>{
 
     return (
       <>
-      <CreateUserModal
-      open={modalOpen}
-      setModalOpen={setModalOpen}
-      selectedId={selectedId}
-      setSelectedId={setSelectedId}
-      />
+      {
+        modalOpen && <CreateUserModal
+        open={modalOpen}
+        setModalOpen={setModalOpen}
+        selectedId={selectedId}
+        setSelectedId={setSelectedId}
+        />
+      }
+      
         <div className='p-5'>
         <div className='flex mb-8 justify-between'>
           <h1 className=' text-xl font-bold'>

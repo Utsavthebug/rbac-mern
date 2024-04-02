@@ -57,18 +57,22 @@ export class UserController{
 
     public static async update(req:Request,res:Response){
         const {id} = req.params
-        const {roleId} = req.body
+        const {role,first_name,last_name,email} = req.body
 
         //getting roles 
-        const roleInstance = await UserController.roleRepository.findOne({
-            where:{
-                role_id:roleId
-            }
-        })
+        let roleInstance;
+        if(role){
+            roleInstance = await UserController.roleRepository.findOne({
+                where:{
+                    role_id:role
+                }
+            })
 
-        if(!roleInstance){
-            return res.status(StatusCodes.NOT_FOUND).json({message:"Invalid Role"})
+            if(!roleInstance){
+                return res.status(StatusCodes.NOT_FOUND).json({message:"Invalid Role"})
+            }
         }
+         
 
         const userInstance = await UserController.userRepository.findOne({
             where:{
@@ -80,7 +84,10 @@ export class UserController{
             return res.status(StatusCodes.NOT_FOUND).json({message:"Invalid User Id"})
         }
 
-         userInstance.role = roleInstance
+        if(roleInstance) userInstance.role = roleInstance
+        if(first_name) userInstance.first_name = first_name
+        if(last_name) userInstance.last_name = last_name
+        if(email) userInstance.email = email
 
          const updated_user = await UserController.userRepository.save(userInstance)
 

@@ -42,10 +42,11 @@ export const deleteUser = createAsyncThunk('users/delete',async(id,{rejectWithVa
 })
 
 
-export const editUser = createAsyncThunk('users/update',async(data,{rejectWithValue})=>{
+export const editUser = createAsyncThunk('users/update',async(editData,{rejectWithValue})=>{
+    console.log(editData,'editData')
     try {
-        const {id,...values} = data
-        const {data} = await axiosInstance.patch(`${apis.user.root}/${id}`)
+        const {id,...values} = editData
+        const {data} = await axiosInstance.patch(`${apis.user.root}/${id}`,values)
         return data
     } catch (error) {
       return rejectWithValue(error.response.data.error.message)   
