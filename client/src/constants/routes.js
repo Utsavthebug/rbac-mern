@@ -1,5 +1,6 @@
 import {lazy} from "react";
 import Users from "../pages/users";
+import Features from "../pages/features";
 
 const Login = lazy(()=>import("../pages/login")) 
 const Roles = lazy(()=>import("../pages/roles"))
@@ -31,6 +32,6 @@ export const adminRoutes = [
     },
     {
         path:`${adminroot}/features`,
-        component:Roles
+        component:Features
     }
 ]

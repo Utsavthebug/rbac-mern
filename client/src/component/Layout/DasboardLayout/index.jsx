@@ -11,7 +11,7 @@ const DashboardLayout = () => {
     dispatch(fetchRoles())
   },[])
   return (
-    <div className='flex'>
+    <div className='flex overflow-hidden'>
         <Sidebar
         />
         <div className='w-full h-screen'>

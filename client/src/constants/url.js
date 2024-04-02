@@ -2,7 +2,8 @@ const app = {
     root:{
         user:'/user',
         auth:'/auth',
-        role:'/role'
+        role:'/role',
+        feature:'/feature'
     },
 }
 
@@ -14,6 +15,9 @@ export const apis = {
     },
     user:{
         root:`${app.root.user}`
+    },
+    feature:{
+        root:`${app.root.feature}`
     }
 
 }

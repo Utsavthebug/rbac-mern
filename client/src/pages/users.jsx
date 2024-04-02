@@ -10,7 +10,7 @@ import Input from '../component/Input'
 import { IoMdPersonAdd } from "react-icons/io";
 import Dropdown from '../component/Dropdown'
 import {useDispatch, useSelector} from 'react-redux'
-import { addUser, deleteUser, editUser, fetchAllUsers, setSelectedUser } from '../store/users/userSlice'
+import { addUser, deleteUser, editUser, fetchAllUsers } from '../store/users/userSlice'
 import FeatureText from '../component/FeatureText'
 import { toast } from 'react-toastify'
 
@@ -287,7 +287,7 @@ const RenderRole = (role)=>{
         onDelete={handleUserDelete}
         data={renderUserTable(users?.users)}
         onEdit={handleUserUpdate}
-        columnKeys={['name','role']}
+        columnKeys={table_constants.user_table.columnKeys}
         />
         </div>
       </>

@@ -45,6 +45,14 @@ export const table_constants = {
         headers:[
             "Name",
             "User Role"
-        ]
+        ],
+        columnKeys:['name','role']
+    },
+    feature_table:{
+        headers:[
+            "Feature Name",
+            "Created At"
+        ],
+        columnKeys:['name','createdAt']
     }
 }
