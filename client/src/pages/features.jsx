@@ -35,7 +35,6 @@ const CreateFeatureModal = ({
   const dispatch = useDispatch()
   const {features} = useSelector((state)=>state.features)
 
- console.log('features',features,selectedId)
 
   const [initialValues,setInitialValues] = useState({
     feature_name:"",
@@ -46,6 +45,7 @@ const CreateFeatureModal = ({
     //getting data from state
     if(selectedId){
       const formData = features?.find((u)=>u.feature_id==selectedId)
+      console.log('formdata',formData)
       setInitialValues({
         feature_name:formData?.feature_name,
         active:formData?.active,
@@ -109,7 +109,7 @@ const isEditMode = !!selectedId
         label="Active"
         name="active"
         handleChange={formik.handleChange}
-        value={formik.values.active}
+        checked={formik.values.active}
         />      
          </div>
     </div>
@@ -143,7 +143,7 @@ const Features = () => {
   const renderfeatureTable = (features) =>{
     return features?.map((feature)=>{
       return {
-        id:feature.id,
+        id:feature.feature_id,
         name: <div className="capitalize font-medium text-gray-700">{feature?.feature_name}</div>,
         createdAt: convertUTCDateToLocalDate(feature?.created_at),
         active: <Checkbox 
@@ -153,9 +153,9 @@ const Features = () => {
     })
   }
 
-  const handleEditClick=(id)=>{
+  const handleEditClick=(data)=>{
+    setSelectedId(data?.id)
     setModalOpen(true)
-    setSelectedId(id)
   }
 
     return (

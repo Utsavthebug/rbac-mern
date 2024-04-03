@@ -235,9 +235,9 @@ const RenderRole = (role)=>{
     dispatch(deleteUser(id))
   }
 
-  const handleUserUpdate = (id)=>{
+  const handleUserUpdate = (data)=>{
     // dispatch(setSelectedUser(id))
-    setSelectedId(id)
+    setSelectedId(data?.id)
     setModalOpen((prev)=>!prev)
   }
 

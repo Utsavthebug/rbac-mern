@@ -60,7 +60,7 @@ const Table = ({
           </button>  
         }
          
-         { onEdit && <button onClick={()=>onEdit(d?.id)}>
+         { onEdit && <button onClick={()=>onEdit(d)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
