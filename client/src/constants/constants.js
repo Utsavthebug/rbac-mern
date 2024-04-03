@@ -61,5 +61,6 @@ export const table_constants = {
 
         ],
         columnKeys:['name','active','createdAt']
-    }
+    },
+
 }

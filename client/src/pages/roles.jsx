@@ -3,14 +3,17 @@ import Table from '../component/Table'
 import SearchBar from '../component/Searchbar'
 import Button from '../component/Button'
 import { table_constants } from '../constants/constants'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchRoles } from '../store/roles/roleSlice'
 
 const Roles = () => {
   const dispatch = useDispatch()
   useEffect(()=>{
     dispatch(fetchRoles())
-  })
+  },[])
+
+  const roles = useSelector((state)=>state.role)
+
   return (
     <div className='p-5'>
     <div className='flex mb-8 justify-between'>
@@ -29,6 +32,7 @@ const Roles = () => {
       </div>
     </div>
     <Table
+    headers={table_constants.role_table.headers}
 
     />
     </div>
