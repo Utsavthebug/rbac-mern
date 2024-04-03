@@ -17,7 +17,8 @@ export const apis = {
         root:`${app.root.user}`
     },
     feature:{
-        root:`${app.root.feature}`
+        root:`${app.root.feature}`,
+        individual:(id)=> `${app.root.feature}/${id}`
     }
 
 }

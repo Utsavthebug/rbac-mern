@@ -29,6 +29,17 @@ export const createFeatures = createAsyncThunk('features/create',async(values,{r
 })
 
 
+export const updateFeatures = createAsyncThunk('features/update',async(values,{rejectWithValue})=>{
+    try {
+        const {id,...rest} = values
+        const {data} = await axiosInstance.patch(apis.feature.individual(id),rest)
+        return data
+    } catch (error) {
+      return rejectWithValue(error.response.data.error.message)   
+    }
+})
+
+
 export const featureSlice = createSlice({
     name:'roles',
     initialState,
@@ -59,7 +70,6 @@ export const featureSlice = createSlice({
     
         builder.addCase(createFeatures.fulfilled,(state,action)=>{
             state.status = fetchStatus.succeded
-            console.log(action.payload.data,'from slice')
             state.features.push(action.payload.data)
         })
     
@@ -67,6 +77,26 @@ export const featureSlice = createSlice({
             state.status = fetchStatus.failed
             state.error = action.payload
         })
+
+        //update features 
+        builder.addCase(updateFeatures.pending,(state,action)=>{
+            state.status = fetchStatus.loading
+        })
+    
+        builder.addCase(updateFeatures.fulfilled,(state,action)=>{
+            state.status = fetchStatus.succeded
+            const data = action.payload.data
+            const intermediate_state = state.features.filter((feature)=>feature.feature_id!=data.feature_id)
+            intermediate_state.unshift(data)
+            state.features = intermediate_state
+        })
+    
+        builder.addCase(updateFeatures.rejected,(state,action)=>{
+            state.status = fetchStatus.failed
+            state.error = action.payload
+        })
+
+
     }
 
 })

@@ -13,7 +13,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import { addUser, deleteUser, editUser, fetchAllUsers } from '../store/users/userSlice'
 import FeatureText from '../component/FeatureText'
 import { toast } from 'react-toastify'
-import { createFeatures, fetchfeatures } from '../store/features/featureSlice'
+import { createFeatures, fetchfeatures, updateFeatures } from '../store/features/featureSlice'
 import Checkbox from '../component/Checkbox'
 import { convertUTCDateToLocalDate } from '../helpers/Datehelper'
 
@@ -62,9 +62,7 @@ const CreateFeatureModal = ({
     validateOnChange:false,
     enableReinitialize:true,
     onSubmit:  async (values,{setErrors,resetForm})=>{
-    //  let response = {}
-     let response =  await dispatch(createFeatures(values))
-    // response = !selectedId ? await dispatch(addUser(values)) : await dispatch(editUser({...values,id:selectedId}))
+     let response = !selectedId ? await dispatch(createFeatures(values)) : await dispatch(updateFeatures({...values,id:selectedId}))
     
      if(response?.error){
       toast.error(response.payload)
