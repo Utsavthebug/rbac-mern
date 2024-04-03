@@ -10,6 +10,7 @@ const Sidebar = () => {
                  {
                   SidebarConstant.map((sidebarEl)=>(
                    <SidebarElement
+                   key={sidebarEl.id}
                    label={sidebarEl.label}
                    Icon={sidebarEl.icon}
                    path={sidebarEl.path}

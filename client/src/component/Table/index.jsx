@@ -4,7 +4,7 @@ const Table = ({
   headers=[],
   onEdit,
   onDelete,
-  data,
+  data=[],
   columnKeys=[]
 }) => {
 
@@ -19,8 +19,8 @@ const Table = ({
     <thead className="bg-gray-50">
       <tr>
         {
-          final_headers.map((header)=>(
-        <th scope="col" className="px-6 py-4 font-medium text-gray-900">{header==="Action"?"":header}</th>
+          final_headers?.map((header,index)=>(
+        <th key={index} scope="col" className="px-6 py-4 font-medium text-gray-900">{header==="Action"?"":header}</th>
           ))
         }
     
@@ -28,10 +28,10 @@ const Table = ({
     </thead>
     <tbody className="divide-y divide-gray-100 border-t border-gray-100">     
         {
-          data.map(d =>(
-            <tr className="hover:bg-gray-50">
+          data?.map(d =>(
+            <tr key={d.id} className="hover:bg-gray-50">
       {
-        columnKeys.map((key,index)=>(
+        columnKeys?.map((key,index)=>(
           <td className='px-6 py-4' key={index}>
             {d[key]}
           </td>
