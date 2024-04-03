@@ -130,12 +130,11 @@ const Features = () => {
   const [selectedId,setSelectedId] = useState(undefined)
   const [search,setSearch] = useState('')
   
-
-  
-
   useEffect(()=>{
+    if(!search.length){
     dispatch(fetchfeatures())
-  },[])
+    }
+  },[search])
 
 
   const renderfeatureTable = (features) =>{
@@ -157,8 +156,17 @@ const Features = () => {
   }
 
   const handleDeleteClick =(data)=>{
-    console.log(data)
     dispatch(deleteFeatures(data?.id))
+  }
+
+  const handleSearchChange =(e)=>{
+    setSearch(e.target.value)
+  }
+
+  const handleKeyDown = (event)=>{
+    if(event.key==='Enter' && search.length>0){
+      dispatch(fetchfeatures({search}))
+    }
   }
 
     return (
@@ -182,8 +190,8 @@ const Features = () => {
           <SearchBar
           name="features"
           search={search}
-        //   handleChange={handleSearchChange}
-        //   onkeydown={handleKeyDown}
+          handleChange={handleSearchChange}
+          onkeydown={handleKeyDown}
           />
     
           <Button

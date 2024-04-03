@@ -9,9 +9,9 @@ const initialState = {
     status:""
 }
 
-export const fetchfeatures = createAsyncThunk('features/fetch',async(_,{rejectWithValue})=>{
+export const fetchfeatures = createAsyncThunk('features/fetch',async(params={},{rejectWithValue})=>{
     try {
-        const {data} = await axiosInstance.get(apis.feature.root)
+        const {data} = await axiosInstance.get(apis.feature.root,{params})
         return data
     } catch (error) {
       return rejectWithValue(error.response.data.error.message)   
