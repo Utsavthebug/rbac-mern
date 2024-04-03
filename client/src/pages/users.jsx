@@ -282,6 +282,8 @@ const RenderRole = (role)=>{
           />
           </div>
         </div>
+
+        <div className='h-[calc(100vh-7rem)] overflow-auto mb-10 table-scrollbar'>
         <Table
         headers={table_constants.user_table.headers}
         onDelete={handleUserDelete}
@@ -289,6 +291,8 @@ const RenderRole = (role)=>{
         onEdit={handleUserUpdate}
         columnKeys={table_constants.user_table.columnKeys}
         />
+        </div>
+       
         </div>
       </>
       )

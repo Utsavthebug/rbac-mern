@@ -51,8 +51,10 @@ export const table_constants = {
     feature_table:{
         headers:[
             "Feature Name",
-            "Created At"
+            "Active for All",
+            "Created At",
+
         ],
-        columnKeys:['name','createdAt']
+        columnKeys:['name','active','createdAt']
     }
 }

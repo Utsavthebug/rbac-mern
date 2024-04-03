@@ -145,7 +145,10 @@ const Features = () => {
       return {
         id:feature.id,
         name: <div className="capitalize font-medium text-gray-700">{feature?.feature_name}</div>,
-        createdAt: convertUTCDateToLocalDate(feature?.created_at)
+        createdAt: convertUTCDateToLocalDate(feature?.created_at),
+        active: <Checkbox 
+        readOnly={true}
+        checked={feature.active} />
       }
     })
   }
