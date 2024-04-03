@@ -6,7 +6,8 @@ const Table = ({
   onEdit,
   onDelete,
   data=[],
-  columnKeys=[]
+  columnKeys=[],
+  collapsible_table_headers=[]
 }) => {
 
   const hasAction = onEdit || onDelete

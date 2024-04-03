@@ -44,7 +44,9 @@ export const table_constants = {
             "Role",
             "Created",
             "Description"
-        ]
+        ],
+        columnKeys:["name","createdAt","description"],
+        collapsible_table_header:["","Read","Write","None"]
     },
     user_table:{
         headers:[
