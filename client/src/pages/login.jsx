@@ -42,6 +42,7 @@ function Login() {
           errors={formik.errors}
           handleChange={formik.handleChange}
           name="email"
+          value={formik.values.email}
           />
 
           <Input
@@ -50,6 +51,7 @@ function Login() {
           name="password"
           errors={formik.errors}
           handleChange={formik.handleChange}
+          value={formik.values.password}
           />
 
           <div>
