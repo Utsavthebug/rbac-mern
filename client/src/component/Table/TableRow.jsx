@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
+import Table from '.'
 
 const TableRow = ({
     columnKeys,
     info,
     onDelete,
-    onEdit
+    onEdit,
+    collapsible_table_headers,
+    collapsible_table_columnKey
 }) => {
   const hasAction = onEdit || onDelete
   const [openCollapsibleRow,setOpenCollapsibleRow] = useState(false)
@@ -67,12 +70,19 @@ const TableRow = ({
         </div>
       </td>)
       }
-    </tr> 
-      {/* {
-        openCollapsibleRow &&  <tr>
-        Hello world
-    </tr>
-      } */}
+    </tr > 
+      {
+        (openCollapsibleRow && info?.children?.length>0) &&
+        <tr>
+          <td colSpan={columnKeys?.length} className='p-4'>
+        <Table
+        headers={collapsible_table_headers}
+        data={info?.children}
+        columnKeys={collapsible_table_columnKey}
+        />
+        </td>
+        </tr>
+      }
    
    </React.Fragment>
   )

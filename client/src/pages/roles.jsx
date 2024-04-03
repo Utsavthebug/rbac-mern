@@ -22,7 +22,9 @@ const Roles = () => {
   const renderSubTableData = (data)=>{
     return data.map((d)=>{
       return {
-       name:features.find((feature)=>feature?.feature_id==d?.featureId)?.feature_name,
+       name: <div className='capitalize font-medium text-gray-700'>
+        {features.find((feature)=>feature?.feature_id==d?.featureId)?.feature_name}
+       </div> ,
        read : <Checkbox checked={d?.feature_access==="read"}/>,
        write: <Checkbox  checked={d?.feature_access==="write"}/>,
        none: <Checkbox  checked={d?.feature_access==="none"}/>
@@ -64,7 +66,8 @@ const Roles = () => {
     data={renderRoleTable(roles?.roles)}
     columnKeys={table_constants.role_table.columnKeys}
     collapsible_table_headers={table_constants.role_table.collapsible_table_header}
-    />
+    collapsible_table_columnKey={table_constants.role_table.collapsible_table_columnKeys}
+   />
     </div>
   )
 }

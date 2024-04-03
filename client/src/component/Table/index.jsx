@@ -7,14 +7,16 @@ const Table = ({
   onDelete,
   data=[],
   columnKeys=[],
-  collapsible_table_headers=[]
+  collapsible_table_headers=[],
+  collapsible_table_columnKey=[]
 }) => {
 
   const hasAction = onEdit || onDelete
   const final_headers = [
     ...headers,
     (hasAction && "Action")
-  ]
+  ].filter((d)=>!!d)
+
   return (
     <div className="rounded-lg border border-gray-200 shadow-md">
   <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
@@ -36,6 +38,8 @@ const Table = ({
             info={d}
             onDelete={onDelete}
             onEdit={onEdit}
+            collapsible_table_headers={collapsible_table_headers}
+            collapsible_table_columnKey={collapsible_table_columnKey}
             />
           ))
         }
