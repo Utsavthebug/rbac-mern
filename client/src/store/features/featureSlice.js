@@ -40,6 +40,17 @@ export const updateFeatures = createAsyncThunk('features/update',async(values,{r
 })
 
 
+export const deleteFeatures = createAsyncThunk('features/delete',async(id,{rejectWithValue})=>{
+    try {
+        await axiosInstance.delete(apis.feature.individual(id))
+        return id
+    } catch (error) {
+      return rejectWithValue(error.response.data.error.message)   
+    }
+})
+
+
+
 export const featureSlice = createSlice({
     name:'roles',
     initialState,
@@ -96,6 +107,22 @@ export const featureSlice = createSlice({
             state.error = action.payload
         })
 
+
+        //delete features
+        builder.addCase(deleteFeatures.pending,(state,action)=>{
+            state.status = fetchStatus.loading
+        })
+    
+        builder.addCase(deleteFeatures.fulfilled,(state,action)=>{
+            state.status = fetchStatus.succeded
+            console.log(action.payload,'xxx')
+            state.features = state.features.filter((feature)=>feature.feature_id!=action.payload)
+            })
+    
+        builder.addCase(deleteFeatures.rejected,(state,action)=>{
+            state.status = fetchStatus.failed
+            state.error = action.payload
+        })
 
     }
 

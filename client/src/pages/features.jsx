@@ -13,7 +13,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import { addUser, deleteUser, editUser, fetchAllUsers } from '../store/users/userSlice'
 import FeatureText from '../component/FeatureText'
 import { toast } from 'react-toastify'
-import { createFeatures, fetchfeatures, updateFeatures } from '../store/features/featureSlice'
+import { createFeatures, deleteFeatures, fetchfeatures, updateFeatures } from '../store/features/featureSlice'
 import Checkbox from '../component/Checkbox'
 import { convertUTCDateToLocalDate } from '../helpers/Datehelper'
 
@@ -156,6 +156,11 @@ const Features = () => {
     setModalOpen(true)
   }
 
+  const handleDeleteClick =(data)=>{
+    console.log(data)
+    dispatch(deleteFeatures(data?.id))
+  }
+
     return (
       <>
       {
@@ -190,7 +195,7 @@ const Features = () => {
         <div className='h-[calc(100vh-7rem)] overflow-auto mb-10 table-scrollbar'>
         <Table
         headers={table_constants.feature_table.headers}
-        onDelete={()=>{}}
+        onDelete={handleDeleteClick}
         data={renderfeatureTable(features)}
         onEdit={handleEditClick}
         columnKeys={table_constants.feature_table.columnKeys}
