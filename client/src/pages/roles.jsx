@@ -13,11 +13,40 @@ import Input from '../component/Input'
 import Modal from '../component/Modal'
 import { useFormik } from 'formik'
 import * as Yup from 'yup';
+import Select from 'react-select';
 
 
 const createRoleSchema = Yup.object().shape({
   role_name: Yup.string().required('Role name is required'),
 })
+
+
+const renderSubTableData = (data,features)=>{
+  return data.map((d)=>{
+    return {
+      id:d?.featureId,
+     name: <div className='capitalize font-medium text-gray-700'>
+      {features.find((feature)=>feature?.feature_id==d?.featureId)?.feature_name}
+     </div> ,
+     read : <Checkbox checked={d?.feature_access==="read"}/>,
+     write: <Checkbox  checked={d?.feature_access==="write"}/>,
+     none: <Checkbox  checked={d?.feature_access==="none"}/>
+    }
+  })
+}
+
+
+const renderRoleTable = (data,features)=>{
+  return data.map((d)=>{
+    return {
+      id:d?.role_id,
+      name: <div className='capitalize font-medium text-gray-700'>{d?.role_name}</div>,
+      createdAt:convertUTCDateToLocalDate(d?.created_at),
+      description:d?.description,
+      children:renderSubTableData(d?.featuretoroles,features)
+    }
+  })
+}
 
 const CreateRoleModal = ({
   open,
@@ -25,6 +54,10 @@ const CreateRoleModal = ({
   selectedId,
   setSelectedId
 })=>{
+
+  //getting features from state 
+  const {features} = useSelector((state)=>state.features)
+  const [selectedFeatures,setSelectedFeatures] = useState([])
 
   const [initialValues,setInitialValues] = useState({
     role_name:"",
@@ -54,6 +87,14 @@ const CreateRoleModal = ({
 
   // const validationschema = selectedId ? updateUserSchema : createUserSchema
 
+  const FeatureDropdownOptions =(data)=>{
+    return data.map((d)=>{
+      return {
+        value:d?.feature_id,
+        label:d?.feature_name
+      }
+    })
+  } 
 
   const formik = useFormik({
     initialValues,
@@ -83,14 +124,37 @@ const CreateRoleModal = ({
     setSelectedId(undefined)
   }
 
+ 
+  const handleFeatureSelect = (d)=>{
+    //getting list of selected Ids 
+    const selected_ids = selectedFeatures.map((d)=>d?.featureId)
+
+    //setting default none to features 
+    const new_selected_array = d.map((data)=>{
+      if(!selected_ids.includes(data.value)){
+        return {
+          featureId:data.value,
+          feature_access:'none'
+        }
+      }
+     //select object from selected 
+     else{
+      const selected_feature = selectedFeatures.find((selected)=>selected.featureId==data.value)
+      return selected_feature
+     }
+    
+    })
+    setSelectedFeatures(new_selected_array)
+  }
+
 
 //if selectedId is present it is in edit Mode
-const isEditMode = !!selectedId
   return (
     <Modal 
     open={open}
     onClose={toggleModal}
     title="Create Roles">
+    <>
   <form onSubmit={formik.handleSubmit} className="p-4 md:p-5" noValidate>
     <div className="grid gap-4 mb-4 grid-cols-2">
   <div className="col-span-2">
@@ -106,7 +170,13 @@ const isEditMode = !!selectedId
       </div>
 
         <div className="col-span-2">
-          
+         <label className="block text-sm font-medium leading-6 text-gray-900 mb-2">Features</label>
+        <Select
+        closeMenuOnSelect={false}
+        isMulti
+        onChange={handleFeatureSelect}
+        options={FeatureDropdownOptions(features)}
+        />
         </div>
     </div>
 
@@ -114,6 +184,16 @@ const isEditMode = !!selectedId
     icon={<IoMdPersonAdd/>}
     label={"Add New Roles"}/>
 </form>
+
+<div className='max-h-[200px] overflow-y-auto'>
+{ selectedFeatures.length >0 && <Table
+  headers={[" ","Read","Write","None"]}
+  data={renderSubTableData(selectedFeatures,features)}
+  columnKeys={["name","read","write","none"]}
+  />
+}
+</div>
+</>
 </Modal>
   )
 };
@@ -132,31 +212,8 @@ const Roles = () => {
   const roles = useSelector((state)=>state.role)
   const {features} = useSelector((state)=>state.features)
 
-  const renderSubTableData = (data)=>{
-    return data.map((d)=>{
-      return {
-       name: <div className='capitalize font-medium text-gray-700'>
-        {features.find((feature)=>feature?.feature_id==d?.featureId)?.feature_name}
-       </div> ,
-       read : <Checkbox checked={d?.feature_access==="read"}/>,
-       write: <Checkbox  checked={d?.feature_access==="write"}/>,
-       none: <Checkbox  checked={d?.feature_access==="none"}/>
-      }
-    })
-  }
 
 
-  const renderRoleTable = (data)=>{
-    return data.map((d)=>{
-      return {
-        id:d?.role_id,
-        name: <div className='capitalize font-medium text-gray-700'>{d?.role_name}</div>,
-        createdAt:convertUTCDateToLocalDate(d?.created_at),
-        description:d?.description,
-        children:renderSubTableData(d?.featuretoroles)
-      }
-    })
-  }
 
   const handleAddBtnClick = ()=>{
     setModalOpen(true)
@@ -192,7 +249,7 @@ const Roles = () => {
     </div>
     <Table
     headers={table_constants.role_table.headers}
-    data={renderRoleTable(roles?.roles)}
+    data={renderRoleTable(roles?.roles,features)}
     columnKeys={table_constants.role_table.columnKeys}
     collapsible_table_headers={table_constants.role_table.collapsible_table_header}
     collapsible_table_columnKey={table_constants.role_table.collapsible_table_columnKeys}

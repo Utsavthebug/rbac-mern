@@ -6,12 +6,12 @@ const axiosInstance = axios.create({
     withCredentials:true
 })
 
+
 axiosInstance.interceptors.response.use(
     (response) => {
         return response;
     },
     (error) => {
-        console.log(error)
         if (error.response && error.response.status === 401) {
             sessionStorage.clear()
             window.location.href="/login"
