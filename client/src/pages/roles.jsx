@@ -4,7 +4,7 @@ import SearchBar from '../component/Searchbar'
 import Button from '../component/Button'
 import { table_constants } from '../constants/constants'
 import { useDispatch, useSelector } from 'react-redux'
-import { createRole, fetchRoles } from '../store/roles/roleSlice'
+import { createRole, deleteRole, fetchRoles } from '../store/roles/roleSlice'
 import { convertUTCDateToLocalDate } from '../helpers/Datehelper'
 import { fetchfeatures } from '../store/features/featureSlice'
 import Checkbox from '../component/Checkbox'
@@ -58,6 +58,7 @@ const CreateRoleModal = ({
 
   //getting features from state 
   const {features} = useSelector((state)=>state.features)
+  const {roles} = useSelector((state)=>state.role)
   const [selectedFeatures,setSelectedFeatures] = useState([])
   const dispatch = useDispatch()
 
@@ -65,29 +66,18 @@ const CreateRoleModal = ({
     role_name:"",
   })
 
-  // useEffect(()=>{
-  //   //getting data from state
-  //   if(selectedId){
-  //     const formData = users?.find((u)=>u.id==selectedId)
-  //     setInitialValues({
-  //       email:formData?.email,
-  //       first_name:formData?.first_name,
-  //       last_name:formData?.last_name,
-  //       role:formData?.role?.role_id
-  //     })
-  //   }
-  //   else{
-  //     setInitialValues({
-  //       email:"",
-  //       password:"",
-  //       first_name:"",
-  //       last_name:"",
-  //       role:""
-  //     })
-  //   }
-  // },[selectedId])
 
-  // const validationschema = selectedId ? updateUserSchema : createUserSchema
+  useEffect(()=>{
+    //getting data from state
+    if(selectedId){
+      const formData = roles?.find((role)=>role?.role_id==selectedId)
+      setInitialValues({
+        role_name:formData?.role_name
+      })
+      setSelectedFeatures(formData?.featuretoroles)
+    }
+  },[selectedId,roles])
+
 
   const FeatureDropdownOptions =(data)=>{
     return data.map((d)=>{
@@ -178,7 +168,7 @@ const CreateRoleModal = ({
         <div className="col-span-2">
          <label className="block text-sm font-medium leading-6 text-gray-900 mb-2">Features</label>
         <Select
-        closeMenuOnSelect={false}
+        closeMenuOnSelect={true}
         isMulti
         onChange={handleFeatureSelect}
         options={FeatureDropdownOptions(features)}
@@ -228,6 +218,15 @@ const Roles = () => {
     setModalOpen(true)
   }
 
+  const handleRoleDelete = (data)=>{
+    dispatch(deleteRole(data?.id))
+  }
+
+  const handleRoleUpdate=(data)=>{
+    setSelectedId(data?.id)
+    setModalOpen(true)
+  }
+
   return (
     <React.Fragment>
       {
@@ -260,6 +259,8 @@ const Roles = () => {
     <Table
     headers={table_constants.role_table.headers}
     data={renderRoleTable(roles?.roles,features)}
+    onDelete={handleRoleDelete}
+    onEdit={handleRoleUpdate}
     columnKeys={table_constants.role_table.columnKeys}
     collapsible_table_headers={table_constants.role_table.collapsible_table_header}
     collapsible_table_columnKey={table_constants.role_table.collapsible_table_columnKeys}

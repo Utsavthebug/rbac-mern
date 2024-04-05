@@ -7,7 +7,8 @@ const TableRow = ({
     onDelete,
     onEdit,
     collapsible_table_headers,
-    collapsible_table_columnKey
+    collapsible_table_columnKey,
+    final_headers=[]
 }) => {
   const hasAction = onEdit || onDelete
   const [openCollapsibleRow,setOpenCollapsibleRow] = useState(false)
@@ -15,6 +16,7 @@ const TableRow = ({
   const handleCollapsibleRow = ()=>{
     setOpenCollapsibleRow((prev)=>!prev)
   }
+
 
   return (
    <React.Fragment>
@@ -30,7 +32,9 @@ const TableRow = ({
       {
         hasAction && (<td className="px-6 py-4">
         <div className="flex justify-end gap-4">
-         {onDelete && <button onClick={()=>onDelete(info)}>
+         {onDelete && <button onClick={(e)=>{
+          e.stopPropagation()
+          onDelete(info)}}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -49,7 +53,9 @@ const TableRow = ({
           </button>  
         }
          
-         { onEdit && <button onClick={()=>onEdit(info)}>
+         { onEdit && <button onClick={(e)=>{
+          e.stopPropagation()
+          onEdit(info)}}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -74,7 +80,7 @@ const TableRow = ({
       {
         (openCollapsibleRow && info?.children?.length>0) &&
         <tr>
-          <td colSpan={columnKeys?.length} className='p-4'>
+          <td colSpan={final_headers.length} className='p-4'>
         <Table
         headers={collapsible_table_headers}
         data={info?.children}

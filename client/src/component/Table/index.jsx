@@ -40,6 +40,7 @@ const Table = ({
             onEdit={onEdit}
             collapsible_table_headers={collapsible_table_headers}
             collapsible_table_columnKey={collapsible_table_columnKey}
+            final_headers={final_headers}
             />
           ))
         }

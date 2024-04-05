@@ -11,7 +11,8 @@ export const apis = {
     me : `${app.root.user}/me`,
     auth:(type)=>`${app.root.auth}/${type}`,
     role:{
-        root:()=> `${app.root.role}`
+        root:()=> `${app.root.role}`,
+        individual:(id)=>`${app.root.role}/${id}`
     },
     user:{
         root:`${app.root.user}`

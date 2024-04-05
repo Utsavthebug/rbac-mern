@@ -23,7 +23,15 @@ export const createRole = createAsyncThunk('roles/create',async(values,{rejectWi
         const {data} = await axiosInstance.post(apis.role.root(),values)
         return data
     } catch (error) {
-        console.log(error)
+      return rejectWithValue(error.response.data.error.message)   
+    }
+})
+
+export const deleteRole = createAsyncThunk('roles/delete',async(id,{rejectWithValue})=>{
+    try {
+        await axiosInstance.delete(apis.role.individual(id))
+        return id
+    } catch (error) {
       return rejectWithValue(error.response.data.error.message)   
     }
 })
@@ -67,6 +75,25 @@ const roleSlice = createSlice({
             state.status = fetchStatus.failed
             state.error = action.payload
         })
+
+        //delete role 
+        builder.addCase(deleteRole.pending,(state,action)=>{
+            state.status = fetchStatus.loading
+        })
+    
+        builder.addCase(deleteRole.fulfilled,(state,action)=>{
+            state.status = fetchStatus.succeded
+            console.log('xx',action.payload)
+            state.roles = state.roles.filter((data)=>data?.role_id!==action.payload)
+
+            // state.roles.push(action.payload.data)
+        })
+    
+        builder.addCase(deleteRole.rejected,(state,action)=>{
+            state.status = fetchStatus.failed
+            state.error = action.payload
+        })
+
     }
 
 })
