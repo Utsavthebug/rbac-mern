@@ -55,16 +55,36 @@ export class RoleController{
 
         const newrole = await RoleController.roleRepository.save(roleInstance)
 
+
         //adding feature to roles 
         if(featuretoroles && featuretoroles.length>0){
-            const newmappeddata = featuretoroles.map((featurerole:any)=>{
-                return {
-                    featureId:featurerole.featureId,
-                    roleId:newrole.role_id,
-                    feature_access:featurerole.feature_access
+            //getting roles Instance 
+            const created_role = await RoleController.roleRepository.findOne({
+                where:{
+                    role_id:newrole.role_id
                 }
             })
-         await RoleController.featuretoRolesRepository.insert(newmappeddata)       
+
+            const newmappeddata = await Promise.all(featuretoroles.map(async(featurerole:any)=>{
+                //fetching feature 
+                const featureInstance = await RoleController.featureRepository.findOne({
+                    where:{
+                        feature_id:featurerole.featureId
+                    }
+                })
+                const FeatureRole = new FeaturesToRoles()
+                FeatureRole.featureId = featurerole.featureId
+                FeatureRole.roleId = newrole.role_id
+                if(featureInstance) FeatureRole.feature = featureInstance
+                FeatureRole.feature_access = featurerole.feature_access
+
+                const feature_role_created = await RoleController.featuretoRolesRepository.save(FeatureRole)
+                return feature_role_created
+                
+            }))
+                
+        if(created_role) created_role.featuretoroles = newmappeddata 
+        created_role && await RoleController.roleRepository.save(created_role)     
     }
 
     const rolewithfeatures = await RoleController.roleRepository.findOne(

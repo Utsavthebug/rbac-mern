@@ -256,6 +256,7 @@ const Roles = () => {
       />
       </div>
     </div>
+    <div className='h-[calc(100vh-7rem)] overflow-auto mb-10 table-scrollbar'>
     <Table
     headers={table_constants.role_table.headers}
     data={renderRoleTable(roles?.roles,features)}
@@ -263,6 +264,7 @@ const Roles = () => {
     collapsible_table_headers={table_constants.role_table.collapsible_table_header}
     collapsible_table_columnKey={table_constants.role_table.collapsible_table_columnKeys}
    />
+    </div>
     </div>
     </React.Fragment>
   )
