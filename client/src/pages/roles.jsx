@@ -66,6 +66,15 @@ const CreateRoleModal = ({
     role_name:"",
   })
 
+  const transformSelectedFeature = (data)=>{
+    return data.map((d)=>{
+      return {
+        label:features.find((feature)=>feature?.feature_id==d?.featureId)?.feature_name,
+        value:d?.featureId
+      }
+    })
+  }
+
 
   useEffect(()=>{
     //getting data from state
@@ -170,6 +179,7 @@ const CreateRoleModal = ({
         <Select
         closeMenuOnSelect={true}
         isMulti
+        value={transformSelectedFeature(selectedFeatures)}
         onChange={handleFeatureSelect}
         options={FeatureDropdownOptions(features)}
         />
