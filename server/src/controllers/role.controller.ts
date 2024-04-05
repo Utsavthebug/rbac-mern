@@ -127,47 +127,70 @@ export class RoleController{
 
         if(role_name) role.role_name = role_name
         if(description) role.description = description
-        await RoleController.roleRepository.save(role)
 
-        //feature roles 
+        //holds all feature roles data
+        let all_feature_roles =[]
+
+        //if feature_roles
         if(feature_roles && feature_roles.length>0){
-        const filtered_feature_roles = feature_roles
-        .filter((featurerole:any)=>!!featurerole.id)
-    
-
-        filtered_feature_roles.length>0 && await RoleController.featuretoRolesRepository.save([...filtered_feature_roles])
-
-        const new_feature_roles = feature_roles
-        .filter((featurerole:any)=>!featurerole.id)
-
-        let feature_role_instances = []
-
-        for(const featurerole of new_feature_roles){
-            const featureroleInstance = new FeaturesToRoles()
-            featureroleInstance.roleId = parseInt(roleId)
-            featureroleInstance.featureId = featurerole.featureId
-            if(featurerole.feature_access) featureroleInstance.feature_access = featurerole.feature_access
-            feature_role_instances.push(featureroleInstance)
-        }
-
-        //saving all instances       
-        feature_role_instances.length > 0 && await RoleController.featuretoRolesRepository.save([...feature_role_instances])
-
-        const rolewithfeatures = await RoleController.roleRepository.findOne(
-            {
-                relations:{
-                    featuretoroles:true
-                },
+            const filtered_feature_roles = feature_roles
+            .filter((featurerole:any)=>!!featurerole.id)
+            
+            //finding feature roles instance 
+          for (const f of filtered_feature_roles){
+            const feature_role_instance = await RoleController.featuretoRolesRepository.findOne({
                 where:{
-                 role_id: parseInt(roleId)   
+                   id:f.id 
                 }
-            }
-        )
+            })
+           if(feature_role_instance) feature_role_instance.feature_access = f.feature_access
            
-        return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:rolewithfeatures})
+           if(feature_role_instance){
+            const updated_feature_role =  await RoleController.featuretoRolesRepository.save(feature_role_instance)
+            all_feature_roles.push(updated_feature_role)
+           }
+          }
 
-       }
-}
+            // filtered_feature_roles.length>0 && await RoleController.featuretoRolesRepository.save([...filtered_feature_roles])
+    
+            const new_feature_roles = feature_roles
+            .filter((featurerole:any)=>!featurerole.id)
+    
+    
+            for(const featurerole of new_feature_roles){
+                const feature = await RoleController.featureRepository.findOneBy({
+                    feature_id:featurerole.featureId
+                })
+
+                const featureroleInstance = new FeaturesToRoles()
+                featureroleInstance.roleId = parseInt(roleId)
+                featurerole.feature = feature
+                featureroleInstance.featureId = featurerole.featureId
+                if(featurerole.feature_access) featureroleInstance.feature_access = featurerole.feature_access
+               const updated_feature_role = await RoleController.featuretoRolesRepository.save(featureroleInstance)
+               all_feature_roles.push(updated_feature_role)
+            }
+
+            role.featuretoroles = all_feature_roles
+
+            //saving 
+            await RoleController.roleRepository.save(role)
+            
+        }
+      
+            const rolewithfeatures = await RoleController.roleRepository.findOne(
+                {
+                    relations:{
+                        featuretoroles:true
+                    },
+                    where:{
+                     role_id: parseInt(roleId)   
+                    }
+                }
+            )
+               
+            return res.status(StatusCodes.CREATED).json({message:"New Role Succesfully Created",data:rolewithfeatures})
+           }
   
     public static async getOne(req:Request,res:Response){
         const {roleId} = req.params

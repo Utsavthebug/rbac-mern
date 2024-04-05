@@ -37,6 +37,15 @@ export const deleteRole = createAsyncThunk('roles/delete',async(id,{rejectWithVa
 })
 
 
+export const updateRole = createAsyncThunk('roles/update',async(data,{rejectWithValue})=>{
+    try {
+        const {roleId,...values} = data
+        const response =  await axiosInstance.patch(apis.role.individual(roleId),values)
+        return response.data
+    } catch (error) {
+      return rejectWithValue(error.response.data.error.message)   
+    }
+})
 
 
 const roleSlice = createSlice({
@@ -90,6 +99,23 @@ const roleSlice = createSlice({
         })
     
         builder.addCase(deleteRole.rejected,(state,action)=>{
+            state.status = fetchStatus.failed
+            state.error = action.payload
+        })
+
+        //update Role 
+        builder.addCase(updateRole.pending,(state,action)=>{
+            state.status = fetchStatus.loading
+        })
+    
+        builder.addCase(updateRole.fulfilled,(state,action)=>{
+            state.status = fetchStatus.succeded
+            console.log('edit action',action.payload)
+            // state.roles = state.roles.filter((data)=>data?.role_id!==action.payload)
+
+        })
+    
+        builder.addCase(updateRole.rejected,(state,action)=>{
             state.status = fetchStatus.failed
             state.error = action.payload
         })

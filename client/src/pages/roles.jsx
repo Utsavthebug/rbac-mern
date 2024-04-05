@@ -4,7 +4,7 @@ import SearchBar from '../component/Searchbar'
 import Button from '../component/Button'
 import { table_constants } from '../constants/constants'
 import { useDispatch, useSelector } from 'react-redux'
-import { createRole, deleteRole, fetchRoles } from '../store/roles/roleSlice'
+import { createRole, deleteRole, fetchRoles, updateRole } from '../store/roles/roleSlice'
 import { convertUTCDateToLocalDate } from '../helpers/Datehelper'
 import { fetchfeatures } from '../store/features/featureSlice'
 import Checkbox from '../component/Checkbox'
@@ -105,8 +105,14 @@ const CreateRoleModal = ({
     enableReinitialize:true,
     onSubmit:  async (values,{setErrors,resetForm})=>{
      let response = {}
+
+     if(!selectedId){
+      response = await dispatch(createRole({...values,featuretoroles:selectedFeatures}))
+     }
+     else {
+      response = await dispatch(updateRole({...values,feature_roles:selectedFeatures,roleId:selectedId}))
+     }
     
-    response = await dispatch(createRole({...values,featuretoroles:selectedFeatures}))
     
     if(response?.error){
     //  toast.error(response.payload)
