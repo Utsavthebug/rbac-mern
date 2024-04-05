@@ -18,6 +18,19 @@ export const fetchRoles = createAsyncThunk('roles/fetch',async(_,{rejectWithValu
     }
 })
 
+export const createRole = createAsyncThunk('roles/create',async(values,{rejectWithValue})=>{
+    try {
+        const {data} = await axiosInstance.post(apis.role.root(),values)
+        return data
+    } catch (error) {
+        console.log(error)
+      return rejectWithValue(error.response.data.error.message)   
+    }
+})
+
+
+
+
 const roleSlice = createSlice({
     name:'roles',
     initialState,
@@ -25,6 +38,7 @@ const roleSlice = createSlice({
 
     },
     extraReducers:(builder) =>{
+        //fetch roles 
         builder.addCase(fetchRoles.pending,(state,action)=>{
             state.status = fetchStatus.loading
         })
@@ -35,6 +49,21 @@ const roleSlice = createSlice({
         })
     
         builder.addCase(fetchRoles.rejected,(state,action)=>{
+            state.status = fetchStatus.failed
+            state.error = action.payload
+        })
+
+        //create roles 
+        builder.addCase(createRole.pending,(state,action)=>{
+            state.status = fetchStatus.loading
+        })
+    
+        builder.addCase(createRole.fulfilled,(state,action)=>{
+            state.status = fetchStatus.succeded
+            state.roles.push(action.payload.data)
+        })
+    
+        builder.addCase(createRole.rejected,(state,action)=>{
             state.status = fetchStatus.failed
             state.error = action.payload
         })

@@ -4,7 +4,7 @@ import SearchBar from '../component/Searchbar'
 import Button from '../component/Button'
 import { table_constants } from '../constants/constants'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchRoles } from '../store/roles/roleSlice'
+import { createRole, fetchRoles } from '../store/roles/roleSlice'
 import { convertUTCDateToLocalDate } from '../helpers/Datehelper'
 import { fetchfeatures } from '../store/features/featureSlice'
 import Checkbox from '../component/Checkbox'
@@ -21,16 +21,17 @@ const createRoleSchema = Yup.object().shape({
 })
 
 
-const renderSubTableData = (data,features)=>{
+const renderSubTableData = ({data,features,handleCheckBoxChange,readOnly=true})=>{
   return data.map((d)=>{
     return {
       id:d?.featureId,
      name: <div className='capitalize font-medium text-gray-700'>
       {features.find((feature)=>feature?.feature_id==d?.featureId)?.feature_name}
      </div> ,
-     read : <Checkbox checked={d?.feature_access==="read"}/>,
-     write: <Checkbox  checked={d?.feature_access==="write"}/>,
-     none: <Checkbox  checked={d?.feature_access==="none"}/>
+     read : <Checkbox 
+     handleChange={handleCheckBoxChange} value='read' readOnly={readOnly} name={d?.featureId} type='radio'  checked={d?.feature_access==="read"}/>,
+     write: <Checkbox handleChange={handleCheckBoxChange} value='write' readOnly={readOnly} name={d?.featureId}  type='radio'   checked={d?.feature_access==="write"}/>,
+     none: <Checkbox handleChange={handleCheckBoxChange} value='none' readOnly={readOnly} name={d?.featureId}  type='radio'   checked={d?.feature_access==="none"}/>
     }
   })
 }
@@ -43,7 +44,7 @@ const renderRoleTable = (data,features)=>{
       name: <div className='capitalize font-medium text-gray-700'>{d?.role_name}</div>,
       createdAt:convertUTCDateToLocalDate(d?.created_at),
       description:d?.description,
-      children:renderSubTableData(d?.featuretoroles,features)
+      children:renderSubTableData({data:d?.featuretoroles,features})
     }
   })
 }
@@ -58,6 +59,7 @@ const CreateRoleModal = ({
   //getting features from state 
   const {features} = useSelector((state)=>state.features)
   const [selectedFeatures,setSelectedFeatures] = useState([])
+  const dispatch = useDispatch()
 
   const [initialValues,setInitialValues] = useState({
     role_name:"",
@@ -105,8 +107,7 @@ const CreateRoleModal = ({
     onSubmit:  async (values,{setErrors,resetForm})=>{
      let response = {}
     
-
-    // response = !selectedId ? await dispatch(addUser(values)) : await dispatch(editUser({...values,id:selectedId}))
+    response = await dispatch(createRole({...values,featuretoroles:selectedFeatures}))
     
     if(response?.error){
     //  toast.error(response.payload)
@@ -147,6 +148,11 @@ const CreateRoleModal = ({
     setSelectedFeatures(new_selected_array)
   }
 
+  const handleCheckBoxChange=(chekboxData)=>{
+    const mapped_selected_feature = selectedFeatures.map((selected)=>((chekboxData.id===selected.featureId ? { ...selected,feature_access:chekboxData.value } : selected)))
+    setSelectedFeatures(mapped_selected_feature)
+  }
+
 
 //if selectedId is present it is in edit Mode
   return (
@@ -180,19 +186,22 @@ const CreateRoleModal = ({
         </div>
     </div>
 
-    <Button 
-    icon={<IoMdPersonAdd/>}
-    label={"Add New Roles"}/>
-</form>
-
-<div className='max-h-[200px] overflow-y-auto'>
-{ selectedFeatures.length >0 && <Table
+  {selectedFeatures.length >0 && <div className='max-h-[200px] overflow-y-auto overflow-x-hidden table-scrollbar'>
+ <Table
   headers={[" ","Read","Write","None"]}
-  data={renderSubTableData(selectedFeatures,features)}
+  data={renderSubTableData({data:selectedFeatures,features,readOnly:false,handleCheckBoxChange})}
   columnKeys={["name","read","write","none"]}
   />
-}
-</div>
+  </div>}
+
+  <div className='mt-2'></div>
+
+<Button 
+icon={<IoMdPersonAdd/>}
+label={"Add New Roles"}/>
+</form>
+
+
 </>
 </Modal>
   )
